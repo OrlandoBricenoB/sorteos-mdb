@@ -1,0 +1,51 @@
+---
+import Seo from "../components/Seo.astro";
+import "../styles/global.css";
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <Seo
+      title="Ejemplo de SEO Directo"
+      description="Esta página muestra cómo usar el componente SEO directamente sin el BaseLayout"
+      keywords={["ejemplo", "seo", "directo"]}
+      siteName="Sorteos Md'B"
+      url="/example-direct-seo"
+      themeColor="#10b981"
+    />
+  </head>
+  <body class="min-h-screen bg-gray-50 text-gray-900">
+    <main class="container mx-auto px-4 py-16">
+      <div class="max-w-3xl mx-auto">
+        <h1 class="text-4xl font-bold text-gray-900 mb-6">
+          Ejemplo de Uso Directo del Componente SEO
+        </h1>
+        <div class="bg-white rounded-lg shadow-lg p-8">
+          <p class="text-gray-600 mb-4">
+            Esta página demuestra cómo usar el componente <code
+              class="bg-gray-100 px-2 py-1 rounded">Seo.astro</code
+            > directamente en lugar de usar el <code
+              class="bg-gray-100 px-2 py-1 rounded">BaseLayout.astro</code
+            >.
+          </p>
+          <p class="text-gray-600 mb-4">
+            Esto te da más control sobre la estructura HTML de tu página cuando
+            lo necesites.
+          </p>
+          <div class="bg-green-50 border-l-4 border-green-500 p-4 mt-6">
+            <p class="text-green-800">
+              <strong>Tip:</strong> Para la mayoría de los casos, usar <code
+                class="bg-green-100 px-2 py-1 rounded">BaseLayout</code
+              > es más conveniente y mantiene la consistencia en todo el sitio.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

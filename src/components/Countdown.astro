@@ -1,0 +1,100 @@
+<section class="py-12 bg-gradient-to-b from-background to-secondary/30">
+  <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-8">
+        <h2
+          class="font-playfair text-3xl md:text-4xl font-bold text-foreground mb-2"
+        >
+          ⏰ Tiempo Restante para el Sorteo
+        </h2>
+        <p class="text-lg text-muted-foreground">
+          El sorteo finaliza el 15 de Diciembre de 2025
+        </p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 md:gap-6 max-w-2xl mx-auto">
+        <!-- Días -->
+        <div
+          class="bg-card rounded-2xl p-6 md:p-8 border border-border/50 shadow-card text-center"
+        >
+          <div
+            id="days"
+            class="font-playfair text-4xl md:text-5xl font-bold text-primary mb-2"
+          >
+            0
+          </div>
+          <div class="text-sm md:text-base text-muted-foreground font-medium">
+            Días
+          </div>
+        </div>
+
+        <!-- Horas -->
+        <div
+          class="bg-card rounded-2xl p-6 md:p-8 border border-border/50 shadow-card text-center"
+        >
+          <div
+            id="hours"
+            class="font-playfair text-4xl md:text-5xl font-bold text-primary mb-2"
+          >
+            0
+          </div>
+          <div class="text-sm md:text-base text-muted-foreground font-medium">
+            Horas
+          </div>
+        </div>
+
+        <!-- Minutos -->
+        <div
+          class="bg-card rounded-2xl p-6 md:p-8 border border-border/50 shadow-card text-center"
+        >
+          <div
+            id="minutes"
+            class="font-playfair text-4xl md:text-5xl font-bold text-primary mb-2"
+          >
+            0
+          </div>
+          <div class="text-sm md:text-base text-muted-foreground font-medium">
+            Minutos
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const targetDate = new Date("2025-12-15T23:59:59").getTime();
+
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+
+    if (distance < 0) {
+      // Si la fecha ya pasó, mostrar ceros
+      document.getElementById("days")!.textContent = "0";
+      document.getElementById("hours")!.textContent = "0";
+      document.getElementById("minutes")!.textContent = "0";
+      return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+    document.getElementById("days")!.textContent = days.toString();
+    document.getElementById("hours")!.textContent = hours
+      .toString()
+      .padStart(2, "0");
+    document.getElementById("minutes")!.textContent = minutes
+      .toString()
+      .padStart(2, "0");
+  }
+
+  // Actualizar inmediatamente
+  updateCountdown();
+
+  // Actualizar cada minuto
+  setInterval(updateCountdown, 60000);
+</script>

@@ -1,0 +1,158 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import ArrowLeft from "../components/icons/ArrowLeft.astro";
+
+const currentDate = new Date().toLocaleDateString("es-ES", {
+  month: "long",
+  year: "numeric",
+});
+---
+
+<BaseLayout
+  title="Política de Privacidad - Sorteos Md'B"
+  description="Conoce cómo protegemos tu información personal en Sorteos Md'B. Política de privacidad transparente y segura."
+  keywords={["privacidad", "política", "datos", "protección", "seguridad"]}
+  siteName="Sorteos Md'B"
+  author="Sorteos Md'B"
+  themeColor="#ff6b9d"
+>
+  <div class="min-h-screen bg-gradient-to-b from-background to-secondary/20">
+    <div class="container mx-auto px-4 py-12">
+      <a href="/">
+        <Button variant="ghost" class="mb-8">
+          <ArrowLeft class="mr-2 h-4 w-4" />
+          Volver al inicio
+        </Button>
+      </a>
+
+      <div
+        class="max-w-4xl mx-auto bg-card rounded-lg shadow-card p-8 space-y-8"
+      >
+        <div class="text-center border-b border-border pb-6">
+          <h1 class="font-playfair text-4xl font-bold text-foreground mb-2">
+            Política de Privacidad
+          </h1>
+          <p class="text-muted-foreground">
+            Última actualización: {currentDate}
+          </p>
+        </div>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            1. Información que Recopilamos
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            En Sorteos Md'B recopilamos únicamente la información necesaria para
+            gestionar tu participación en nuestros sorteos, incluyendo: nombre
+            completo, correo electrónico, número de teléfono y datos de pago
+            necesarios para procesar tu inversión de $2.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            2. Uso de tu Información
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Utilizamos tu información personal exclusivamente para:
+          </p>
+          <ul
+            class="list-disc list-inside text-muted-foreground space-y-2 ml-4"
+          >
+            <li>Gestionar tu participación en el sorteo</li>
+            <li>Procesar pagos y reembolsos del programa de referidos</li>
+            <li>Comunicarnos contigo sobre el estado del sorteo</li>
+            <li>Notificarte si resultas ganador/a</li>
+            <li>Enviar actualizaciones importantes sobre el sorteo</li>
+          </ul>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            3. Protección de Datos
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Tu información está protegida mediante cifrado de última generación.
+            Toda la información es almacenada en servidores seguros en la nube
+            proporcionados por Cloudflare, garantizando los más altos estándares
+            de seguridad y disponibilidad.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            4. Compartir Información con Terceros
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            <strong>No compartimos tu información personal con terceros.</strong
+            > Tu privacidad es nuestra prioridad. La única excepción sería si estamos
+            legalmente obligados a hacerlo por autoridades competentes.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            5. Cookies y Tecnologías Similares
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Utilizamos cookies esenciales para el funcionamiento del sitio web y
+            para mejorar tu experiencia de usuario. No utilizamos cookies de
+            terceros para rastreo publicitario.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            6. Tus Derechos
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">Tienes derecho a:</p>
+          <ul
+            class="list-disc list-inside text-muted-foreground space-y-2 ml-4"
+          >
+            <li>Acceder a tu información personal</li>
+            <li>Solicitar la corrección de datos incorrectos</li>
+            <li>Solicitar la eliminación de tu información</li>
+            <li>Revocar tu consentimiento en cualquier momento</li>
+            <li>Recibir una copia de tus datos en formato legible</li>
+          </ul>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            7. Retención de Datos
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Conservamos tu información personal durante el tiempo necesario para
+            cumplir con los fines del sorteo y las obligaciones legales. Una vez
+            finalizado el sorteo y cumplidas todas las obligaciones, tu
+            información será eliminada de forma segura.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            8. Contacto
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Si tienes preguntas sobre esta política de privacidad o deseas
+            ejercer tus derechos, puedes contactarnos a través de nuestros
+            canales oficiales de comunicación.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            9. Cambios a esta Política
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Nos reservamos el derecho de actualizar esta política de privacidad
+            en cualquier momento. Te notificaremos de cualquier cambio
+            significativo publicando la nueva política en esta página y
+            actualizando la fecha de última modificación.
+          </p>
+        </section>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

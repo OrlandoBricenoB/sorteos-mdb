@@ -1,0 +1,169 @@
+---
+import Upload from "../icons/Upload.astro";
+import File from "../icons/File.astro";
+import X from "../icons/X.astro";
+
+export interface Props {
+  id?: string;
+  name?: string;
+  accept?: string;
+  class?: string;
+  required?: boolean;
+  label?: string;
+}
+
+const {
+  id,
+  name,
+  accept = "image/*",
+  class: className = "",
+  required = false,
+  label,
+} = Astro.props;
+
+const uniqueId = id || `file-input-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class={`space-y-2 ${className}`}>
+  {
+    label && (
+      <label
+        for={uniqueId}
+        class="block font-medium text-foreground"
+        set:html={label}
+      />
+    )
+  }
+  {!label && <slot name="label" />}
+  <div class="file-input-wrapper relative">
+    <input
+      type="file"
+      id={uniqueId}
+      name={name}
+      accept={accept}
+      required={required}
+      class="hidden"
+      data-file-input
+    />
+    <label
+      for={uniqueId}
+      class="file-input-label flex items-center gap-3 w-full px-4 py-3 rounded-xl border-2 border-dashed border-border bg-background text-foreground cursor-pointer hover:border-primary hover:bg-primary/5 transition-all duration-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+    >
+      <div class="flex-shrink-0">
+        <Upload class="w-5 h-5 text-muted-foreground" />
+      </div>
+      <div class="flex-1 min-w-0">
+        <span class="file-input-text text-sm text-muted-foreground">
+          <span class="font-medium text-primary">Haz clic para subir</span> o arrastra
+          y suelta
+        </span>
+        <span
+          class="file-input-name text-sm text-foreground mt-1 truncate hidden"
+        ></span>
+      </div>
+      <div class="file-input-icon flex-shrink-0">
+        <File class="w-5 h-5 text-muted-foreground" />
+      </div>
+    </label>
+    <button
+      type="button"
+      class="file-input-remove hidden absolute -top-2 -right-2 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center hover:bg-destructive/90 transition-colors shadow-sm"
+      data-file-remove
+      aria-label="Eliminar archivo"
+    >
+      <X class="w-4 h-4" />
+    </button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const fileInputs =
+      document.querySelectorAll<HTMLInputElement>("[data-file-input]");
+
+    fileInputs.forEach((input) => {
+      const wrapper = input.closest(".file-input-wrapper");
+      if (!wrapper) return;
+
+      const label = wrapper.querySelector(".file-input-label");
+      const text = wrapper.querySelector(".file-input-text");
+      const nameSpan = wrapper.querySelector(".file-input-name");
+      const icon = wrapper.querySelector(".file-input-icon");
+      const removeBtn =
+        wrapper.querySelector<HTMLButtonElement>("[data-file-remove]");
+
+      const updateDisplay = () => {
+        const file = input.files?.[0];
+
+        if (file) {
+          if (text) text.classList.add("hidden");
+          if (nameSpan) {
+            nameSpan.textContent = file.name;
+            nameSpan.classList.remove("hidden");
+          }
+          if (icon) icon.classList.add("hidden");
+          if (removeBtn) removeBtn.classList.remove("hidden");
+          if (label) {
+            label.classList.remove("border-dashed");
+            label.classList.add(
+              "border-solid",
+              "border-primary",
+              "bg-primary/5"
+            );
+          }
+        } else {
+          if (text) text.classList.remove("hidden");
+          if (nameSpan) nameSpan.classList.add("hidden");
+          if (icon) icon.classList.remove("hidden");
+          if (removeBtn) removeBtn.classList.add("hidden");
+          if (label) {
+            label.classList.add("border-dashed");
+            label.classList.remove(
+              "border-solid",
+              "border-primary",
+              "bg-primary/5"
+            );
+          }
+        }
+      };
+
+      input.addEventListener("change", updateDisplay);
+
+      if (removeBtn) {
+        removeBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          input.value = "";
+          updateDisplay();
+        });
+      }
+
+      // Drag and drop
+      if (label) {
+        label.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          label.classList.add("border-primary", "bg-primary/10");
+        });
+
+        label.addEventListener("dragleave", () => {
+          if (!input.files?.[0]) {
+            label.classList.remove("border-primary", "bg-primary/10");
+          }
+        });
+
+        label.addEventListener("drop", (e: Event) => {
+          e.preventDefault();
+          const dragEvent = e as DragEvent;
+          const files = dragEvent.dataTransfer?.files;
+          if (files && files.length > 0) {
+            const dataTransfer = new DataTransfer();
+            Array.from(files).forEach((file) => dataTransfer.items.add(file));
+            input.files = dataTransfer.files;
+            updateDisplay();
+          }
+          label.classList.remove("border-primary", "bg-primary/10");
+        });
+      }
+    });
+  });
+</script>

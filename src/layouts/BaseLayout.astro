@@ -1,0 +1,73 @@
+---
+import Seo from "../components/Seo.astro";
+import "../styles/global.css";
+
+export interface Props {
+  title: string;
+  description: string;
+  keywords?: string[];
+  image?: string;
+  url?: string;
+  type?: string;
+  siteName?: string;
+  author?: string;
+  robots?: string;
+  canonical?: string;
+  ogImage?: string;
+  twitterCard?: "summary" | "summary_large_image" | "app" | "player";
+  twitterSite?: string;
+  twitterCreator?: string;
+  themeColor?: string;
+  lang?: string;
+}
+
+const {
+  title,
+  description,
+  keywords,
+  image,
+  url,
+  type,
+  siteName,
+  author,
+  robots,
+  canonical,
+  ogImage,
+  twitterCard,
+  twitterSite,
+  twitterCreator,
+  themeColor,
+  lang = "es",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <Seo
+      title={title}
+      description={description}
+      keywords={keywords}
+      image={image}
+      url={url}
+      type={type}
+      siteName={siteName}
+      author={author}
+      robots={robots}
+      canonical={canonical}
+      ogImage={ogImage}
+      twitterCard={twitterCard}
+      twitterSite={twitterSite}
+      twitterCreator={twitterCreator}
+      themeColor={themeColor}
+      lang={lang}
+    />
+  </head>
+  <body class="min-h-screen bg-background text-foreground font-inter">
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,585 @@
+---
+import Button from "./ui/Button.astro";
+import Card from "./ui/Card.astro";
+import Input from "./ui/Input.astro";
+import Label from "./ui/Label.astro";
+import FileInput from "./ui/FileInput.astro";
+import Sparkles from "./icons/Sparkles.astro";
+
+// ---- Datos Server-side (solo para el primer render y SEO, la UI será client-side) ----
+const TOTAL_NUMBERS = 200;
+const unavailableNumbers = [
+  1, 5, 17, 21, 33, 46, 52, 60, 74, 89, 100, 105, 107, 123, 144, 155, 162, 185,
+  198,
+];
+
+const numbersList = Array.from({ length: TOTAL_NUMBERS }, (_, i) => ({
+  number: i + 1,
+  available: !unavailableNumbers.includes(i + 1),
+}));
+
+// Dataset string for passing unavailable numbers to client
+const unavailableDataset = unavailableNumbers.join(",");
+---
+
+<section id="participate-section" class="py-20 bg-gradient-card">
+  <div class="container mx-auto px-4">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-12 space-y-4">
+        <div
+          class="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-4"
+        >
+          <Sparkles class="w-5 h-5 text-primary" />
+          <span class="text-sm font-medium text-primary"
+            >Solo $2 para participar</span
+          >
+        </div>
+        <h2
+          class="font-playfair text-4xl md:text-5xl font-bold text-foreground"
+        >
+          Participa Ahora
+        </h2>
+        <p class="text-xl text-muted-foreground">
+          Completa el formulario y recibe tu código de referido
+        </p>
+      </div>
+      <Card class="p-8 md:p-10 bg-card shadow-glow border-border/50">
+        <form id="participate-form" class="space-y-6">
+          <div class="space-y-2">
+            <Label htmlFor="name" class="text-base"> Nombre completo </Label>
+            <Input
+              id="name"
+              name="name"
+              placeholder="María González"
+              class="h-12 text-base"
+              required
+            />
+          </div>
+          <div class="space-y-2">
+            <Label htmlFor="email" class="text-base">
+              Correo electrónico
+            </Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="maria@ejemplo.com"
+              class="h-12 text-base"
+              required
+            />
+          </div>
+          <div class="bg-secondary rounded-xl p-6 space-y-3">
+            <h3 class="font-semibold text-lg flex items-center gap-2 mb-2">
+              Selecciona tus números para participar:
+            </h3>
+            <div id="number-picker-server">
+              <div
+                class="number-grid"
+                id="astro-number-grid"
+                data-unavailable-numbers={unavailableDataset}
+              >
+                {
+                  numbersList.map(({ number, available }) => (
+                    <button
+                      type="button"
+                      class="number-btn"
+                      disabled={!available}
+                      data-number={number}
+                      data-unavailable={!available ? "true" : undefined}
+                      aria-pressed="false"
+                    >
+                      {number}
+                    </button>
+                  ))
+                }
+              </div>
+              <div
+                class="text-center text-xs mt-2 font-medium"
+                id="astro-numbers-picked-msg"
+              >
+                No has elegido ningún número aún.
+              </div>
+            </div>
+            <div class="text-xs text-muted-foreground mt-2 text-center">
+              Algunos números ya pueden estar tomados. Puedes elegir más de uno.
+            </div>
+          </div>
+          <Button
+            id="participate-btn"
+            type="button"
+            size="lg"
+            class="w-full bg-gradient-cta transition-all duration-300 text-lg py-6 rounded-full font-semibold"
+            disabled
+          >
+            Selecciona al menos un número
+          </Button>
+          <p class="text-center text-sm text-muted-foreground">
+            Al participar aceptas nuestros términos y condiciones del sorteo
+          </p>
+        </form>
+      </Card>
+    </div>
+  </div>
+</section>
+
+<!-- Modal de pago y comprobante -->
+<div
+  id="pago-modal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    class="bg-white rounded-2xl shadow-lg w-full max-w-lg mx-auto p-8 relative"
+  >
+    <button
+      id="pago-modal-close"
+      type="button"
+      class="absolute top-2 right-2 px-3 py-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none"
+      aria-label="Cerrar"
+    >
+      ×
+    </button>
+    <h3 class="text-2xl font-bold mb-4 text-center">Datos para el pago</h3>
+    <div class="space-y-4 mb-6 text-sm text-gray-700">
+      <!-- Datos de pago mejor presentados -->
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="border rounded-lg p-4 bg-primary/5 flex flex-col gap-2">
+          <div class="flex items-center gap-2 mb-2 text-primary font-semibold">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="inline w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 17l4 4 4-4m-4-5v9"></path>
+              <rect
+                width="20"
+                height="12"
+                x="2"
+                y="3"
+                rx="2"
+                ry="2"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"></rect>
+            </svg>
+            Pago móvil
+          </div>
+          <ul class="text-sm text-gray-700 space-y-1">
+            <li><span class="font-medium">Banco:</span> Venezuela</li>
+            <li><span class="font-medium">C.I.:</span> 12345678</li>
+            <li><span class="font-medium">Nombre:</span> Juan Pérez</li>
+            <li><span class="font-medium">Número:</span> 0414-1234567</li>
+          </ul>
+        </div>
+        <div class="border rounded-lg p-4 bg-secondary flex flex-col gap-2">
+          <div class="flex items-center gap-2 mb-2 text-blue-700 font-semibold">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="inline w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <rect
+                width="20"
+                height="12"
+                x="2"
+                y="6"
+                rx="2"
+                ry="2"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"></rect>
+              <path
+                d="M2 10h20"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"></path>
+            </svg>
+            Transferencia Bancaria
+          </div>
+          <ul class="text-sm text-gray-700 space-y-1">
+            <li><span class="font-medium">Banco:</span> Mercantil</li>
+            <li>
+              <span class="font-medium">Cuenta:</span> 0105-0123-4567-8901-2345
+            </li>
+            <li><span class="font-medium">C.I.:</span> 12345678</li>
+            <li><span class="font-medium">Nombre:</span> Juan Pérez</li>
+          </ul>
+        </div>
+      </div>
+      <div class="bg-secondary p-3 rounded text-xs text-gray-500 border">
+        Una vez realizado el pago, adjunta el comprobante y coloca el N° de
+        referencia para confirmar tu participación.
+      </div>
+    </div>
+    <form
+      id="confirm-payment-form"
+      enctype="multipart/form-data"
+      class="space-y-5"
+    >
+      <FileInput
+        id="payment-image"
+        name="paymentImage"
+        accept="image/*"
+        required
+      >
+        <label
+          slot="label"
+          for="payment-image"
+          class="block font-medium text-foreground"
+        >
+          Subir comprobante de pago <span class="text-red-500">*</span>
+        </label>
+      </FileInput>
+      <div class="space-y-2">
+        <Label htmlFor="payment-ref" class="text-base"
+          >N° de referencia <span class="text-red-500">*</span>
+        </Label>
+        <Input
+          id="payment-ref"
+          name="paymentRef"
+          type="text"
+          placeholder="Ej: 123456"
+          class="h-12 text-base"
+          required
+        />
+      </div>
+      <Button
+        id="confirm-payment-btn"
+        type="submit"
+        size="lg"
+        class="w-full bg-gradient-cta transition-all duration-300 text-lg py-6 rounded-full font-semibold"
+      >
+        Confirmar participación
+      </Button>
+      <div id="payment-form-msg" class="text-center text-sm text-red-600 mt-2">
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .number-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
+    grid-auto-flow: row;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .number-grid {
+      grid-template-columns: repeat(10, 1fr);
+    }
+  }
+
+  .number-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    height: 2.5rem;
+    min-width: 32px;
+    max-width: 48px;
+    width: 100%;
+    font-weight: 500;
+    cursor: pointer;
+    background: white;
+    border: 1.5px solid hsl(340 82% 67% / 0.14);
+    color: hsl(340 15% 25%);
+    transition:
+      background 0.15s,
+      border 0.15s,
+      color 0.15s;
+  }
+  .number-btn:hover:not(:disabled):not(.selected):not(.unavailable) {
+    background: #f7e9f2;
+    /* Quitar sombra al hacer hover */
+    /* No box-shadow */
+  }
+  .number-btn.selected {
+    background: linear-gradient(135deg, hsl(340 82% 67%), hsl(330 81% 60%));
+    color: white;
+    border-color: hsl(340 82% 67%);
+  }
+  .number-btn.selected:hover {
+    background: linear-gradient(135deg, hsl(340 75% 60%), hsl(330 75% 45%));
+    /* Aclarar leve al hacer hover si está seleccionado, sin sombra */
+  }
+  .number-btn:disabled,
+  .number-btn.unavailable {
+    background: #f9d9e6;
+    color: #c04a7b;
+    cursor: not-allowed;
+    border-color: #f9d9e6;
+    opacity: 0.8;
+  }
+  .button-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  #pago-modal[open],
+  #pago-modal.show {
+    display: flex;
+  }
+  #pago-modal:not([open]):not(.show) {
+    display: none;
+  }
+</style>
+
+<script type="module">
+  // CLIENT SIDE SELECTION ONLY
+  document.addEventListener("DOMContentLoaded", () => {
+    const grid = document.getElementById("astro-number-grid");
+    let unavailableNumbers = [];
+    if (grid) {
+      const datasetVal = grid.dataset.unavailableNumbers;
+      if (datasetVal) {
+        unavailableNumbers = datasetVal
+          .split(",")
+          .map((n) => parseInt(n, 10))
+          .filter((n) => !isNaN(n));
+      }
+    }
+
+    const selectedNumbers = new Set();
+    const PARTICIPATION_COST = 2;
+
+    const btn = document.getElementById("participate-btn");
+
+    function renderPicked() {
+      const msg = document.getElementById("astro-numbers-picked-msg");
+      if (!msg) return;
+      if (selectedNumbers.size > 0) {
+        msg.innerHTML = `Números elegidos: <span style="color: hsl(340 82% 67%)">${Array.from(
+          selectedNumbers
+        )
+          .sort((a, b) => a - b)
+          .join(", ")}</span>`;
+      } else {
+        msg.textContent = "No has elegido ningún número aún.";
+      }
+      renderButtonAndCost();
+    }
+
+    function renderButtonAndCost() {
+      if (!btn) return;
+      const count = selectedNumbers.size;
+      if (count > 0) {
+        btn.disabled = false;
+        btn.textContent = `Participar por $${count * PARTICIPATION_COST}`;
+        btn.classList.remove("button-disabled");
+      } else {
+        btn.disabled = true;
+        btn.textContent = `Selecciona al menos un número`;
+        btn.classList.add("button-disabled");
+      }
+    }
+
+    // Solo cambia las clases para selección (no re-render ni eliminación de nodos)
+    if (grid) {
+      Array.from(grid.querySelectorAll(".number-btn")).forEach((btnNum) => {
+        const number = parseInt(btnNum.dataset.number, 10);
+        const isUnavailable =
+          btnNum.dataset.unavailable === "true" || btnNum.disabled;
+
+        if (!isUnavailable) {
+          btnNum.addEventListener("click", () => {
+            if (selectedNumbers.has(number)) {
+              selectedNumbers.delete(number);
+              btnNum.classList.remove("selected");
+              btnNum.setAttribute("aria-pressed", "false");
+            } else {
+              selectedNumbers.add(number);
+              btnNum.classList.add("selected");
+              btnNum.setAttribute("aria-pressed", "true");
+            }
+            renderPicked();
+          });
+        }
+      });
+    }
+
+    renderPicked();
+
+    // Modal
+    const modal = document.getElementById("pago-modal");
+    const closeModalButton = document.getElementById("pago-modal-close");
+    const paymentForm = document.getElementById("confirm-payment-form");
+    const paymentMsg = document.getElementById("payment-form-msg");
+
+    function openModal() {
+      modal.classList.add("show");
+      document.body.style.overflow = "hidden";
+    }
+    function closeModal() {
+      modal.classList.remove("show");
+      document.body.style.overflow = "";
+      if (paymentForm) paymentForm.reset();
+      if (paymentMsg) paymentMsg.textContent = "";
+    }
+
+    if (closeModalButton) {
+      closeModalButton.addEventListener("click", closeModal);
+    }
+    // Cerrar modal al click fuera
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // Botón principal abre modal (NO submit del primer form)
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      // Validaciones
+      const name = document.getElementById("name")?.value?.trim();
+      const email = document.getElementById("email")?.value?.trim();
+      if (!name || !email) {
+        alert("Por favor completa todos los campos para participar.");
+        return;
+      }
+      if (selectedNumbers.size === 0) {
+        alert("Por favor selecciona al menos un número para participar.");
+        return;
+      }
+      openModal();
+    });
+
+    // Confirmar participación (modal)
+    paymentForm?.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const name = document.getElementById("name")?.value?.trim();
+      const email = document.getElementById("email")?.value?.trim();
+      const numbers = Array.from(selectedNumbers).sort((a, b) => a - b);
+      const paymentImageInput = document.getElementById("payment-image");
+      const paymentImage = paymentImageInput?.files?.[0];
+      const paymentRefInput = document.getElementById("payment-ref");
+      const paymentRef = paymentRefInput?.value?.trim();
+
+      // Chequeo específico para los campos requeridos en el modal de pago
+      if (!paymentRef) {
+        paymentMsg.textContent =
+          "Por favor ingresa el N° de referencia de pago.";
+        paymentRefInput?.focus();
+        return;
+      }
+      if (!paymentImage) {
+        paymentMsg.textContent =
+          "Por favor adjunta el comprobante de pago (imagen obligatoria).";
+        paymentImageInput?.focus();
+        return;
+      }
+      // Validaciones básicas
+      if (!name || !email || numbers.length === 0) {
+        paymentMsg.textContent = "Por favor llena todos los campos requeridos.";
+        return;
+      }
+
+      paymentMsg.textContent = "Enviando...";
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("numbers", JSON.stringify(numbers));
+      formData.append("paymentRef", paymentRef);
+      formData.append("paymentImage", paymentImage);
+
+      // Llamar a la API del backend
+      const submitButton = document.getElementById("confirm-payment-btn");
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Enviando...";
+      }
+
+      try {
+        const resp = await fetch(
+          "https://api.sorteosmdb.com/api/v1/participants",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const data = await resp.json();
+
+        if (resp.ok && data.ok) {
+          console.log("data", data);
+          paymentMsg.textContent = "";
+          paymentMsg.className = "text-center text-sm text-green-600 mt-2";
+          paymentMsg.textContent = "¡Participación confirmada exitosamente!";
+
+          // Mostrar código de referido si está disponible
+          if (data.data?.referral_code) {
+            setTimeout(() => {
+              alert(
+                `¡Participación confirmada!\n\nTu código de referido es: ${data.data.referral_code}\n\nComparte este código con tus amigos para ganar $0.5 por cada participante que invite.`
+              );
+            }, 100);
+          } else {
+            setTimeout(() => {
+              alert(
+                `¡Participación confirmada! Te enviaremos el código de referido próximamente. ¡Gracias!`
+              );
+            }, 100);
+          }
+
+          closeModal();
+
+          // Limpia todo
+          selectedNumbers.clear();
+          if (grid) {
+            Array.from(grid.querySelectorAll(".number-btn.selected")).forEach(
+              (btnSel) => {
+                btnSel.classList.remove("selected");
+                btnSel.setAttribute("aria-pressed", "false");
+              }
+            );
+          }
+          renderPicked();
+          document.getElementById("participate-form").reset();
+        } else {
+          // Manejar errores de la API
+          const errorMessage =
+            data.message ||
+            data.details ||
+            "Error al enviar tus datos. Intenta nuevamente.";
+          paymentMsg.textContent = errorMessage;
+          paymentMsg.className = "text-center text-sm text-red-600 mt-2";
+
+          // Mostrar detalles adicionales si están disponibles
+          if (data.details) {
+            console.error("Error details:", data.details);
+          }
+        }
+      } catch (err) {
+        console.error("Error al enviar datos:", err);
+        paymentMsg.textContent =
+          "Error de red al enviar los datos. Verifica tu conexión e intenta nuevamente.";
+        paymentMsg.className = "text-center text-sm text-red-600 mt-2";
+      } finally {
+        // Restaurar el botón
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = "Confirmar participación";
+        }
+      }
+    });
+
+    // Resetear estado modal al cerrar
+    window.addEventListener("keyup", (e) => {
+      if (
+        modal.classList.contains("show") &&
+        (e.key === "Escape" || e.keyCode === 27)
+      ) {
+        closeModal();
+      }
+    });
+  });
+</script>

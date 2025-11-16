@@ -1,0 +1,293 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import ArrowLeft from "../components/icons/ArrowLeft.astro";
+
+const currentDate = new Date().toLocaleDateString("es-ES", {
+  month: "long",
+  year: "numeric",
+});
+---
+
+<BaseLayout
+  title="Términos y Condiciones - Sorteos Md'B"
+  description="Lee los términos y condiciones del sorteo de Sorteos Md'B. Conoce las reglas, elegibilidad y proceso del sorteo."
+  keywords={["términos", "condiciones", "sorteo", "reglas", "elegibilidad"]}
+  siteName="Sorteos Md'B"
+  author="Sorteos Md'B"
+  themeColor="#ff6b9d"
+>
+  <div class="min-h-screen bg-gradient-to-b from-background to-secondary/20">
+    <div class="container mx-auto px-4 py-12">
+      <a href="/">
+        <Button variant="ghost" class="mb-8">
+          <ArrowLeft class="mr-2 h-4 w-4" />
+          Volver al inicio
+        </Button>
+      </a>
+
+      <div
+        class="max-w-4xl mx-auto bg-card rounded-lg shadow-card p-8 space-y-8"
+      >
+        <div class="text-center border-b border-border pb-6">
+          <h1 class="font-playfair text-4xl font-bold text-foreground mb-2">
+            Términos y Condiciones del Sorteo
+          </h1>
+          <p class="text-muted-foreground">
+            Última actualización: {currentDate}
+          </p>
+        </div>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            1. Aceptación de los Términos
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Al participar en el sorteo de Sorteos Md'B, aceptas estar legalmente
+            vinculado/a por estos términos y condiciones. Si no estás de acuerdo
+            con alguno de estos términos, no participes en el sorteo.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            2. Descripción del Sorteo
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            El sorteo ofrece la oportunidad de ganar un pack completo de
+            productos para el cuidado del cabello de L'Oreal Paris. La inversión
+            para participar es de $2 USD (dos dólares estadounidenses) por
+            entrada.
+          </p>
+          <div
+            class="bg-primary/5 p-4 rounded-lg border border-primary/20 mt-4"
+          >
+            <p class="text-sm text-muted-foreground">
+              <strong>Importante:</strong> Este sorteo no está afiliado, patrocinado
+              ni avalado por L'Oreal Paris. Los productos son adquiridos de manera
+              independiente por Sorteos Md'B para ser entregados como premio.
+            </p>
+          </div>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            3. Elegibilidad
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Para participar en el sorteo debes:
+          </p>
+          <ul
+            class="list-disc list-inside text-muted-foreground space-y-2 ml-4"
+          >
+            <li>
+              Ser mayor de 18 años o tener consentimiento de un tutor legal
+            </li>
+            <li>Proporcionar información personal verdadera y precisa</li>
+            <li>Realizar el pago de la inversión de $2 USD</li>
+            <li>Aceptar estos términos y condiciones</li>
+          </ul>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            4. Programa de Referidos
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Los participantes pueden ganar $0.50 USD por cada persona que
+            inviten y que complete su participación en el sorteo. Las
+            condiciones del programa de referidos son:
+          </p>
+          <ul
+            class="list-disc list-inside text-muted-foreground space-y-2 ml-4"
+          >
+            <li>El referido debe completar el pago de su participación</li>
+            <li>
+              La comisión se acredita una vez confirmado el pago del referido
+            </li>
+            <li>
+              Con 4 referidos exitosos, recuperas tu inversión completa de $2
+              USD
+            </li>
+            <li>
+              Los pagos de comisiones se procesan según nuestro calendario
+              establecido
+            </li>
+            <li>No se permiten métodos fraudulentos para generar referidos</li>
+          </ul>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            5. Proceso de Selección del Ganador
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            El ganador será seleccionado mediante un proceso aleatorio y
+            transparente. La fecha del sorteo será comunicada previamente a
+            todos los participantes. El proceso será:
+          </p>
+          <ul
+            class="list-disc list-inside text-muted-foreground space-y-2 ml-4"
+          >
+            <li>Selección aleatoria mediante sistema automatizado</li>
+            <li>Verificación de elegibilidad del ganador</li>
+            <li>
+              Notificación al ganador a través del correo electrónico registrado
+            </li>
+            <li>Publicación del nombre del ganador (con su consentimiento)</li>
+          </ul>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            6. Entrega del Premio
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            El ganador deberá:
+          </p>
+          <ul
+            class="list-disc list-inside text-muted-foreground space-y-2 ml-4"
+          >
+            <li>
+              Responder a nuestra notificación en un plazo de 7 días hábiles
+            </li>
+            <li>Proporcionar una dirección de envío válida</li>
+            <li>Verificar su identidad si así se requiere</li>
+          </ul>
+          <p class="text-muted-foreground leading-relaxed mt-4">
+            El premio será enviado sin costo adicional para el ganador. Si el
+            ganador no responde en el plazo establecido, se seleccionará un
+            nuevo ganador.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            7. Prohibiciones
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Queda estrictamente prohibido:
+          </p>
+          <ul
+            class="list-disc list-inside text-muted-foreground space-y-2 ml-4"
+          >
+            <li>Usar métodos automatizados o bots para participar</li>
+            <li>Crear múltiples cuentas fraudulentas</li>
+            <li>Manipular el sistema de referidos</li>
+            <li>Proporcionar información falsa</li>
+            <li>Transferir o vender tu participación</li>
+          </ul>
+          <p class="text-muted-foreground leading-relaxed mt-4">
+            Cualquier violación resultará en la descalificación inmediata sin
+            derecho a reembolso.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            8. Política de Reembolsos
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Las inversiones de participación ($2 USD) son no reembolsables una
+            vez confirmada la participación en el sorteo, excepto en caso de:
+          </p>
+          <ul
+            class="list-disc list-inside text-muted-foreground space-y-2 ml-4"
+          >
+            <li>Cancelación del sorteo por parte de Sorteos Md'B</li>
+            <li>Problemas técnicos que impidan tu participación</li>
+            <li>Error en el procesamiento del pago</li>
+          </ul>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            9. Limitación de Responsabilidad
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Sorteos Md'B no se hace responsable por:
+          </p>
+          <ul
+            class="list-disc list-inside text-muted-foreground space-y-2 ml-4"
+          >
+            <li>Problemas técnicos o interrupciones del servicio</li>
+            <li>Retrasos en la entrega causados por servicios de mensajería</li>
+            <li>Uso inadecuado de los productos del premio</li>
+            <li>
+              Pérdida o daño del premio durante el envío (contamos con seguro de
+              envío)
+            </li>
+          </ul>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            10. Modificaciones y Cancelación
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Sorteos Md'B se reserva el derecho de:
+          </p>
+          <ul
+            class="list-disc list-inside text-muted-foreground space-y-2 ml-4"
+          >
+            <li>Modificar estos términos y condiciones en cualquier momento</li>
+            <li>Cancelar o posponer el sorteo por causas de fuerza mayor</li>
+            <li>Descalificar participantes que violen estos términos</li>
+            <li>Cambiar la fecha del sorteo con previo aviso</li>
+          </ul>
+          <p class="text-muted-foreground leading-relaxed mt-4">
+            En caso de cancelación del sorteo, se realizará el reembolso
+            completo a todos los participantes.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            11. Protección de Datos
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Tu información personal será tratada conforme a nuestra{" "}
+            <a
+              href="/privacy-policy"
+              class="text-primary hover:underline font-medium"
+            >
+              Política de Privacidad
+            </a>
+            . Toda la información es almacenada en servidores seguros en la nube
+            proporcionados por Cloudflare. No compartimos información personal con
+            terceros.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            12. Ley Aplicable
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Estos términos y condiciones se rigen por las leyes aplicables en la
+            jurisdicción donde opera Sorteos Md'B. Cualquier disputa será
+            resuelta mediante arbitraje o mediación antes de proceder a litigio.
+          </p>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="font-playfair text-2xl font-semibold text-foreground">
+            13. Contacto
+          </h2>
+          <p class="text-muted-foreground leading-relaxed">
+            Para preguntas sobre estos términos y condiciones, puedes
+            contactarnos a través de nuestros canales oficiales de comunicación
+            disponibles en el sitio web.
+          </p>
+        </section>
+
+        <div class="bg-primary/5 p-6 rounded-lg border border-primary/20 mt-8">
+          <p class="text-sm text-muted-foreground text-center">
+            Al participar en este sorteo, confirmas que has leído, entendido y
+            aceptado estos términos y condiciones en su totalidad.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

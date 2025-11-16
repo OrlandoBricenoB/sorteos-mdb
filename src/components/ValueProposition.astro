@@ -1,0 +1,67 @@
+---
+import Card from "./ui/Card.astro";
+import Gift from "./icons/Gift.astro";
+import DollarSign from "./icons/DollarSign.astro";
+import Users from "./icons/Users.astro";
+import Trophy from "./icons/Trophy.astro";
+
+const benefits = [
+  {
+    icon: Gift,
+    title: "Premios originales",
+    description:
+      "Pack completo de productos L'Oreal Paris ELVIVE Glycolic Gloss valorado en más de $50",
+  },
+  {
+    icon: DollarSign,
+    title: "Inversión accesible",
+    description:
+      "Solo $2 para participar en el sorteo con las mismas oportunidades",
+  },
+  {
+    icon: Users,
+    title: "Recupera y gana",
+    description:
+      "Gana $0.5 por cada amiga que participe, con solo 4 recuperas tu inversión.",
+  },
+  {
+    icon: Trophy,
+    title: "Sorteo Transparente",
+    description:
+      "Proceso 100% transparente y verificable para todos los participantes",
+  },
+];
+---
+
+<section id="how-it-works" class="py-20 bg-gradient-card">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-16 space-y-4">
+      <h2 class="font-playfair text-4xl md:text-5xl font-bold text-foreground">
+        ¿Por Qué Participar?
+      </h2>
+      <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+        Sorteos Md'B te da una oportunidad única de ganar productos originales
+        con una inversión accesible
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {
+        benefits.map((benefit) => {
+          const IconComponent = benefit.icon;
+          return (
+            <Card class="p-6 bg-card hover:shadow-card transition-all duration-300 border-border/50 hover:border-primary/50 group">
+              <div class="mb-4 inline-flex p-3 rounded-2xl bg-secondary group-hover:bg-primary/10 transition-colors">
+                <IconComponent class="w-8 h-8 text-primary" />
+              </div>
+              <h3 class="text-xl font-semibold mb-2 text-card-foreground">
+                {benefit.title}
+              </h3>
+              <p class="text-muted-foreground">{benefit.description}</p>
+            </Card>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>

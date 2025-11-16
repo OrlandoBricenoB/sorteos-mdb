@@ -1,0 +1,75 @@
+---
+import Card from "./ui/Card.astro";
+import Star from "./icons/Star.astro";
+
+const testimonials = [
+  {
+    name: "María González",
+    comment:
+      "¡No podía creerlo cuando gané! Los productos son increíbles y el proceso fue súper transparente.",
+    rating: 5,
+    initials: "MG",
+  },
+  {
+    name: "Laura Martínez",
+    comment:
+      "Invité a mis amigas y recuperé mi inversión antes del sorteo. ¡Totalmente recomendado!",
+    rating: 5,
+    initials: "LM",
+  },
+  {
+    name: "Sofia Rodríguez",
+    comment:
+      "El pack de L'Oreal es hermoso. Participar fue muy fácil y solo costó $2. Vale totalmente la pena.",
+    rating: 5,
+    initials: "SR",
+  },
+];
+---
+
+<section class="py-20 bg-gradient-hero">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12 space-y-4">
+      <h2 class="font-playfair text-4xl md:text-5xl font-bold text-foreground">
+        Lo Que Dicen Nuestras Ganadoras
+      </h2>
+      <p class="text-xl text-muted-foreground">
+        Historias reales de participantes felices
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      {
+        testimonials.map((testimonial) => (
+          <Card class="p-6 bg-card hover:shadow-card transition-all duration-300 border-border/50">
+            <div class="flex gap-1 mb-4">
+              {Array.from({ length: testimonial.rating }).map(() => (
+                <Star class="w-5 h-5 fill-primary text-primary" />
+              ))}
+            </div>
+
+            <p class="text-muted-foreground mb-6 italic">
+              "{testimonial.comment}"
+            </p>
+
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <span class="font-semibold text-primary">
+                  {testimonial.initials}
+                </span>
+              </div>
+              <div>
+                <div class="font-semibold text-card-foreground">
+                  {testimonial.name}
+                </div>
+                <div class="text-sm text-muted-foreground">
+                  Participante verificada
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))
+      }
+    </div>
+  </div>
+</section>

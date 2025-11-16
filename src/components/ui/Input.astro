@@ -1,0 +1,40 @@
+---
+export interface Props {
+  id?: string;
+  name?: string;
+  type?:
+    | "text"
+    | "email"
+    | "tel"
+    | "password"
+    | "number"
+    | "date"
+    | "time"
+    | "url"
+    | "search";
+  placeholder?: string;
+  value?: string;
+  class?: string;
+  required?: boolean;
+}
+
+const {
+  id,
+  name,
+  type = "text",
+  placeholder = "",
+  value = "",
+  class: className = "",
+  required = false,
+} = Astro.props;
+---
+
+<input
+  id={id}
+  name={name}
+  type={type as any}
+  placeholder={placeholder}
+  value={value}
+  required={required}
+  class={`w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all ${className}`}
+/>

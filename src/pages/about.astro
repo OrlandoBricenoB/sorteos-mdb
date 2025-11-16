@@ -1,0 +1,34 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Acerca de"
+  description="Conoce más sobre nosotros y nuestra misión. Descubre quiénes somos y qué hacemos."
+  keywords={["acerca de", "sobre nosotros", "información"]}
+  url="/about"
+  siteName="Sorteos Md'B"
+  themeColor="#3b82f6"
+>
+  <main class="container mx-auto px-4 py-16">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-4xl font-bold text-gray-900 mb-6">Acerca de Nosotros</h1>
+      <div class="prose prose-lg max-w-none">
+        <p class="text-gray-600 mb-4">
+          Esta es una página de ejemplo que demuestra cómo usar el componente
+          SEO en diferentes páginas de tu sitio.
+        </p>
+        <p class="text-gray-600 mb-4">
+          Cada página puede tener sus propios metadatos personalizados para SEO,
+          incluyendo título, descripción, palabras clave, imágenes y más.
+        </p>
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-6">
+          <p class="text-blue-800">
+            <strong>Nota:</strong> Este componente SEO es completamente reutilizable
+            y fácil de usar en cualquier página de tu proyecto.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
