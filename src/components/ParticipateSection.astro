@@ -483,7 +483,10 @@ const unavailableDataset = unavailableNumbers.join(",");
         return;
       }
 
-      paymentMsg.textContent = "Enviando...";
+      // Limpiar mensajes anteriores
+      paymentMsg.textContent = "";
+      paymentMsg.className = "text-center text-sm mt-2";
+
       const formData = new FormData();
       formData.append("name", name);
       formData.append("email", email);
@@ -549,7 +552,7 @@ const unavailableDataset = unavailableNumbers.join(",");
           const errorMessage =
             data.message ||
             data.details ||
-            "Error al enviar tus datos. Intenta nuevamente.";
+            "Error al enviar tus datos. Intenta de nuevo.";
           paymentMsg.textContent = errorMessage;
           paymentMsg.className = "text-center text-sm text-red-600 mt-2";
 
