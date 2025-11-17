@@ -8,10 +8,24 @@ import Sparkles from "./icons/Sparkles.astro";
 
 // ---- Datos Server-side (solo para el primer render y SEO, la UI será client-side) ----
 const TOTAL_NUMBERS = 200;
-const unavailableNumbers = [
-  1, 5, 17, 21, 33, 46, 52, 60, 74, 89, 100, 105, 107, 123, 144, 155, 162, 185,
-  198,
-];
+const RAFFLE_ID = "1";
+const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
+
+// Obtener unavailableNumbers desde el endpoint del backend (SSR)
+let unavailableNumbers = [];
+try {
+  const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`);
+  const data = await resp.json();
+  if (resp.ok && data.ok) {
+    unavailableNumbers = Array.isArray(data.data?.numbers)
+      ? data.data.numbers.filter(
+          (n: number) => typeof n === "number" && !Number.isNaN(n)
+        )
+      : [];
+  }
+} catch (err) {
+  unavailableNumbers = [];
+}
 
 const numbersList = Array.from({ length: TOTAL_NUMBERS }, (_, i) => ({
   number: i + 1,
