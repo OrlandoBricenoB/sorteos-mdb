@@ -493,6 +493,10 @@ const unavailableDataset = unavailableNumbers.join(",");
       formData.append("numbers", JSON.stringify(numbers));
       formData.append("paymentRef", paymentRef);
       formData.append("paymentImage", paymentImage);
+      const storedReferral = localStorage.getItem("referralCode");
+      if (storedReferral) {
+        formData.append("referredBy", storedReferral);
+      }
 
       // Llamar a la API del backend
       const submitButton = document.getElementById("confirm-payment-btn");
