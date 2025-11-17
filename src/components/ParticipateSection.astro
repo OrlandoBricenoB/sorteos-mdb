@@ -340,6 +340,9 @@ const unavailableDataset = unavailableNumbers.join(",");
   // CLIENT SIDE SELECTION ONLY
   document.addEventListener("DOMContentLoaded", () => {
     const grid = document.getElementById("astro-number-grid");
+    const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
+    const RAFFLE_ID = "1";
+    const numberButtons = new Map();
     let unavailableNumbers = [];
     if (grid) {
       const datasetVal = grid.dataset.unavailableNumbers;
@@ -352,6 +355,7 @@ const unavailableDataset = unavailableNumbers.join(",");
     }
 
     const selectedNumbers = new Set();
+    const unavailableSet = new Set(unavailableNumbers);
     const PARTICIPATION_COST = 2;
 
     const btn = document.getElementById("participate-btn");
@@ -385,10 +389,48 @@ const unavailableDataset = unavailableNumbers.join(",");
       }
     }
 
+    function markButtonAsUnavailable(btnNum) {
+      if (!btnNum) return;
+      btnNum.classList.remove("selected");
+      btnNum.setAttribute("aria-pressed", "false");
+      btnNum.classList.add("unavailable");
+      btnNum.disabled = true;
+      btnNum.dataset.unavailable = "true";
+    }
+
+    function applyUnavailableState(numbers = []) {
+      numbers
+        .filter((n) => typeof n === "number" && !Number.isNaN(n))
+        .forEach((number) => {
+          unavailableSet.add(number);
+          const btnNum = numberButtons.get(number);
+          markButtonAsUnavailable(btnNum);
+          if (selectedNumbers.has(number)) {
+            selectedNumbers.delete(number);
+          }
+        });
+      renderPicked();
+    }
+
+    async function fetchUnavailableNumbersFromAPI() {
+      try {
+        const resp = await fetch(
+          `${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`
+        );
+        const data = await resp.json();
+        if (resp.ok && data.ok) {
+          applyUnavailableState(data.data?.numbers ?? []);
+        }
+      } catch (error) {
+        console.warn("No se pudieron actualizar los números", error);
+      }
+    }
+
     // Solo cambia las clases para selección (no re-render ni eliminación de nodos)
     if (grid) {
       Array.from(grid.querySelectorAll(".number-btn")).forEach((btnNum) => {
         const number = parseInt(btnNum.dataset.number, 10);
+        numberButtons.set(number, btnNum);
         const isUnavailable =
           btnNum.dataset.unavailable === "true" || btnNum.disabled;
 
@@ -399,6 +441,10 @@ const unavailableDataset = unavailableNumbers.join(",");
               btnNum.classList.remove("selected");
               btnNum.setAttribute("aria-pressed", "false");
             } else {
+              if (unavailableSet.has(number)) {
+                markButtonAsUnavailable(btnNum);
+                return;
+              }
               selectedNumbers.add(number);
               btnNum.classList.add("selected");
               btnNum.setAttribute("aria-pressed", "true");
@@ -410,6 +456,8 @@ const unavailableDataset = unavailableNumbers.join(",");
     }
 
     renderPicked();
+    applyUnavailableState(unavailableNumbers);
+    fetchUnavailableNumbersFromAPI();
 
     // Modal
     const modal = document.getElementById("pago-modal");
@@ -523,10 +571,10 @@ const unavailableDataset = unavailableNumbers.join(",");
           paymentMsg.textContent = "¡Participación confirmada exitosamente!";
 
           // Mostrar código de referido si está disponible
-          if (data.data?.referral_code) {
+          if (data.data?.participant?.referral_code) {
             setTimeout(() => {
               alert(
-                `¡Participación confirmada!\n\nTu código de referido es: ${data.data.referral_code}\n\nComparte este código con tus amigos para ganar $0.5 por cada participante que invite.`
+                `¡Participación confirmada!\n\nTu código de referido es: ${data.data.participant.referral_code}\n\nComparte este código con tus amigos para ganar $0.5 por cada participante que invite.`
               );
             }, 100);
           } else {
@@ -549,10 +597,25 @@ const unavailableDataset = unavailableNumbers.join(",");
               }
             );
           }
+          const takenNumbersSuccess = data.data?.numbers_taken ?? [];
+          if (
+            Array.isArray(takenNumbersSuccess) &&
+            takenNumbersSuccess.length > 0
+          ) {
+            applyUnavailableState(takenNumbersSuccess);
+          }
+          await fetchUnavailableNumbersFromAPI();
           renderPicked();
           document.getElementById("participate-form").reset();
         } else {
           // Manejar errores de la API
+          const numbersTakenError = data.data?.numbers_taken ?? [];
+          if (
+            Array.isArray(numbersTakenError) &&
+            numbersTakenError.length > 0
+          ) {
+            applyUnavailableState(numbersTakenError);
+          }
           const errorMessage =
             data.message ||
             data.details ||
