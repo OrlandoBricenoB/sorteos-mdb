@@ -17,6 +17,45 @@ import Footer from "../components/Footer.astro";
   themeColor="#ff6b9d"
 >
   <div class="min-h-screen font-inter">
+    <script>
+      // Maneja el referral guardándolo en localStorage si viene como query ?r=
+      (function () {
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const r = params.get("r");
+          const reserved = ["api", "assets", "_astro", "node_modules"];
+          let referralStored = false;
+          if (
+            r &&
+            typeof r === "string" &&
+            !r.includes(".") &&
+            reserved.indexOf(r.toLowerCase()) === -1
+          ) {
+            localStorage.setItem("referralCode", r);
+            referralStored = true;
+          }
+          // Si ya almacenamos el referral, quitamos el ?r= de la URL para la vista del usuario
+          if (referralStored) {
+            const url = new URL(window.location.href);
+            url.searchParams.delete("r");
+            // solo reemplazar si el search cambia realmente
+            if (window.location.search !== url.search) {
+              window.history.replaceState(
+                {},
+                document.title,
+                url.pathname + url.search + url.hash
+              );
+            }
+          }
+        } catch (err) {
+          // Silenciar cualquier error de parsing
+          console.warn(
+            "No se pudo procesar el código de referido del query",
+            err
+          );
+        }
+      })();
+    </script>
     <Hero />
     <ValueProposition />
     <ReferralProgram />
