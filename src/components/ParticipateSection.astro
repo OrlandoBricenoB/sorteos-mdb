@@ -724,6 +724,12 @@ const unavailableDataset = unavailableNumbers.join(",");
           renderPicked();
           document.getElementById("participate-form").reset();
 
+          // Limpiar el input de tipo 'file' específicamente
+          const paymentImageInput = document.getElementById("payment-image");
+          if (paymentImageInput instanceof HTMLInputElement) {
+            paymentImageInput.value = "";
+          }
+
           // Mostrar modal de éxito con código de referido
           const referralCode = data.data?.participant?.referral_code;
           if (referralCode) {
@@ -732,7 +738,7 @@ const unavailableDataset = unavailableNumbers.join(",");
             // Fallback si no hay código
             setTimeout(() => {
               alert(
-                `¡Participación confirmada! Te enviaremos el código de referido próximamente. ¡Gracias!`
+                `¡Participación confirmada! Te enviaremos el código de referido a tu correo electrónico próximamente. ¡Gracias por participar!`
               );
             }, 100);
           }
