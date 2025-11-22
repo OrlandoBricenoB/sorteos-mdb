@@ -261,13 +261,11 @@
         // Verificar si Web Share API está disponible
         try {
           await navigator.share(shareData);
-          alert("Compartido");
           btnText.textContent = "¡Compartido!";
           setTimeout(() => {
             btnText.textContent = "Compartir Link";
           }, 2000);
         } catch (err) {
-          alert(JSON.stringify(err));
           if ((err as Error)?.name !== "AbortError") {
             console.error("Error al compartir:", err);
             copyToClipboard();
