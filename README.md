@@ -1,118 +1,124 @@
-# Sorteos MDB
+# Sorteos Md'B - Frontend
 
-Proyecto construido con Astro y Tailwind CSS, con un componente SEO reutilizable para gestionar los metadatos de cada página.
+Sitio web para sorteos con sistema de referidos, construido con Astro y desplegado en Cloudflare Pages.
 
-## 🚀 Características
+## 🚀 Tecnologías
 
-- ⚡ **Astro** - Framework web moderno y rápido
-- 🎨 **Tailwind CSS** - Framework CSS utility-first
-- 🔍 **Componente SEO** - Gestión completa de metadatos SEO
-- 📦 **Estructura limpia** - Código organizado y simple
+- **Astro 5** - Framework web moderno con SSR
+- **Tailwind CSS** - Framework de CSS utility-first
+- **Cloudflare Pages** - Hosting y SSR edge computing
+- **TypeScript** - Tipado estático
 
 ## 📦 Instalación
 
 ```bash
-npm install
+pnpm install
 ```
 
-## 🛠️ Comandos
+## 🛠️ Desarrollo
 
-| Comando           | Acción                                               |
-| :---------------- | :--------------------------------------------------- |
-| `npm install`     | Instala las dependencias                             |
-| `npm run dev`     | Inicia el servidor de desarrollo en `localhost:4321` |
-| `npm run build`   | Construye el sitio para producción en `./dist/`      |
-| `npm run preview` | Previsualiza la build local, antes de publicar       |
+```bash
+# Servidor de desarrollo
+pnpm dev
+
+# El sitio estará disponible en http://localhost:4321
+```
+
+## 🏗️ Build
+
+```bash
+# Build para producción
+pnpm build
+
+# Preview del build localmente
+pnpm preview
+
+# Preview con Wrangler (simula Cloudflare Pages)
+pnpm preview:cf
+```
+
+## 🌐 Deployment a Cloudflare Pages
+
+### Opción 1: Desde el Dashboard de Cloudflare
+
+1. Ve a [Cloudflare Pages](https://dash.cloudflare.com/)
+2. Crea un nuevo proyecto
+3. Conecta tu repositorio de GitHub
+4. Configura el build:
+   - **Build command**: `pnpm build`
+   - **Build output directory**: `dist`
+   - **Framework preset**: Astro
+5. Haz deploy
+
+### Opción 2: Desde la línea de comandos
+
+```bash
+# Primero, haz login en Cloudflare
+npx wrangler login
+
+# Deploy
+npx wrangler pages deploy dist
+```
 
 ## 📁 Estructura del Proyecto
 
 ```
-/
-├── public/
-│   └── favicon.svg
+sorteos-mdb/
 ├── src/
-│   ├── components/
-│   │   └── Seo.astro          # Componente SEO reutilizable
-│   ├── layouts/
-│   │   └── BaseLayout.astro    # Layout base con SEO
-│   ├── pages/
-│   │   ├── index.astro         # Página de inicio
-│   │   └── about.astro         # Página de ejemplo
-│   └── styles/
-│       └── global.css          # Estilos globales con Tailwind
-├── astro.config.mjs
-├── tailwind.config.mjs
-└── package.json
+│   ├── components/     # Componentes reutilizables
+│   ├── layouts/        # Layouts de página
+│   ├── pages/          # Páginas (rutas)
+│   └── styles/         # Estilos globales
+├── public/             # Archivos estáticos
+├── dist/               # Build output (generado)
+└── astro.config.mjs    # Configuración de Astro
 ```
 
-## 🔍 Uso del Componente SEO
+## ⚙️ Configuración SSR
 
-El componente `Seo.astro` puede ser usado directamente o a través del `BaseLayout.astro`.
+El proyecto está configurado para usar **Server-Side Rendering (SSR)** con el adaptador de Cloudflare:
 
-### Uso con BaseLayout
-
-```astro
----
-import BaseLayout from '../layouts/BaseLayout.astro';
----
-
-<BaseLayout
-  title="Mi Página"
-  description="Descripción de la página"
-  keywords={['keyword1', 'keyword2']}
-  siteName="Mi Sitio"
-  image="/imagen.jpg"
-  url="/mi-pagina"
-  themeColor="#3b82f6"
->
-  <!-- Contenido de la página -->
-</BaseLayout>
+```javascript
+// astro.config.mjs
+export default defineConfig({
+  output: "server",
+  adapter: cloudflare({
+    mode: "directory",
+  }),
+});
 ```
 
-### Uso directo del componente SEO
+Esto significa que:
 
-```astro
----
-import Seo from '../components/Seo.astro';
----
+- ✅ Las páginas se generan dinámicamente en cada request
+- ✅ Los datos siempre están actualizados (no necesita rebuilds)
+- ✅ Se ejecuta en el edge de Cloudflare (ultra rápido)
 
-<html>
-  <head>
-    <Seo
-      title="Mi Página"
-      description="Descripción de la página"
-      keywords={['keyword1', 'keyword2']}
-      siteName="Mi Sitio"
-    />
-  </head>
-  <body>
-    <!-- Contenido -->
-  </body>
-</html>
-```
+## 🔗 API Backend
 
-## 📝 Propiedades del Componente SEO
+El frontend consume la API en: `https://api.sorteosmdb.com/api/v1`
 
-| Propiedad        | Tipo       | Descripción                                       |
-| ---------------- | ---------- | ------------------------------------------------- |
-| `title`          | `string`   | Título de la página (requerido)                   |
-| `description`    | `string`   | Descripción para SEO (requerido)                  |
-| `keywords`       | `string[]` | Array de palabras clave                           |
-| `image`          | `string`   | URL de la imagen principal                        |
-| `url`            | `string`   | URL canónica de la página                         |
-| `type`           | `string`   | Tipo de contenido (default: 'website')            |
-| `siteName`       | `string`   | Nombre del sitio                                  |
-| `author`         | `string`   | Autor de la página                                |
-| `robots`         | `string`   | Directivas para robots (default: 'index, follow') |
-| `canonical`      | `string`   | URL canónica personalizada                        |
-| `ogImage`        | `string`   | Imagen para Open Graph                            |
-| `twitterCard`    | `string`   | Tipo de tarjeta de Twitter                        |
-| `twitterSite`    | `string`   | Usuario de Twitter del sitio                      |
-| `twitterCreator` | `string`   | Creador del contenido                             |
-| `themeColor`     | `string`   | Color del tema (default: '#ffffff')               |
-| `lang`           | `string`   | Idioma (default: 'es')                            |
+Endpoints principales:
 
-## 📚 Recursos
+- `GET /raffles/:id/numbers` - Obtener números ocupados
+- `POST /participants` - Crear participante
+- `GET /participants` - Obtener participante por email
 
-- [Documentación de Astro](https://docs.astro.build)
-- [Documentación de Tailwind CSS](https://tailwindcss.com/docs)
+## 📝 Notas
+
+- El proyecto usa **SSR** por lo que no genera HTML estático
+- Cada página se renderiza en tiempo real en Cloudflare Workers
+- Los datos de la API siempre están frescos sin necesidad de rebuilds
+- El favicon está en `/public/favicon.svg`
+
+## 🤝 Contribuir
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto es privado y pertenece a Sorteos Md'B.

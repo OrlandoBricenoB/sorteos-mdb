@@ -2,10 +2,6 @@ name = "sorteos-mdb"
 compatibility_date = "2024-11-22"
 pages_build_output_dir = "./dist"
 
-# Configuración para Cloudflare Pages
-[build]
-command = "pnpm build"
-
 # Variables de entorno (puedes configurarlas en el dashboard de Cloudflare)
 # [env.production]
 # API_BASE_URL = "https://api.sorteosmdb.com"
