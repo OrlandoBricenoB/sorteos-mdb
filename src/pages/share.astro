@@ -1,7 +1,13 @@
 ---
 // Página para compartir código de referido
-// La lógica para obtener el 'code' y generar el 'referralLink' se ha movido al cliente
-// ya que Astro.url.searchParams es para SSR y no para SSG en tiempo de ejecución del navegador.
+// Lógica SSR para obtener el 'code' y generar el 'referralLink'
+const code = Astro.url.searchParams.get("code");
+
+if (!code) {
+  return Astro.redirect("/");
+}
+
+const referralLink = `https://sorteosmdb.com/?r=${code}`;
 ---
 
 <!doctype html>
@@ -195,7 +201,7 @@
 
       <div class="code-box">
         <div class="code-label">Tu Código de Referido</div>
-        <div class="code" id="referral-code">Cargando...</div>
+        <div class="code" id="referral-code">{code}</div>
 
         <button id="share-btn" class="btn">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,7 +218,9 @@
 
       <div class="link-box">
         <div class="link-label">O copia este link:</div>
-        <a href="#" class="link" id="referral-link-display">Cargando...</a>
+        <a href={referralLink} class="link" id="referral-link-display"
+          >{referralLink}</a
+        >
       </div>
 
       <div class="info-box">
@@ -221,36 +229,9 @@
       </div>
     </div>
 
-    <script>
-      const shareBtn = document.getElementById("share-btn")!;
-      const btnText = document.getElementById("btn-text")!;
-      const referralCodeElement = document.getElementById("referral-code")!;
-      const referralLinkDisplay = document.getElementById(
-        "referral-link-display"
-      )! as HTMLAnchorElement;
-
-      // Obtener el código de referido del query string en el cliente
-      const searchParams = new URLSearchParams(window.location.search);
-      const code = searchParams.get("code");
-
-      // Construir el link de referido client-side
-      const referralLink = code
-        ? `https://sorteosmdb.com/?r=${code}`
-        : "https://sorteosmdb.com/";
-
-      // Redirigir si no hay código
-      if (!code) {
-        window.location.href = "/";
-      }
-
-      // Actualizar el DOM con el código y el link
-      if (referralCodeElement) {
-        referralCodeElement.textContent = code || "N/A"; // Mostrar N/A si no hay código
-      }
-      if (referralLinkDisplay) {
-        referralLinkDisplay.href = referralLink;
-        referralLinkDisplay.textContent = referralLink;
-      }
+    <script define:vars={{ referralLink }}>
+      const shareBtn = document.getElementById("share-btn");
+      const btnText = document.getElementById("btn-text");
 
       async function shareReferral() {
         const shareData = {
@@ -267,7 +248,7 @@
             btnText.textContent = "Compartir Link";
           }, 2000);
         } catch (err) {
-          if ((err as Error)?.name !== "AbortError") {
+          if (err?.name !== "AbortError") {
             console.error("Error al compartir:", err);
             copyToClipboard();
           }
