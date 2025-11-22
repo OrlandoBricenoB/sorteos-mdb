@@ -281,6 +281,101 @@ const unavailableDataset = unavailableNumbers.join(",");
   </div>
 </div>
 
+<!-- Modal de éxito con código de referido -->
+<div
+  id="success-modal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 relative animate-scale-in"
+  >
+    <button
+      id="success-modal-close"
+      type="button"
+      class="absolute top-4 right-4 px-3 py-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none transition-colors"
+      aria-label="Cerrar"
+    >
+      ✕
+    </button>
+
+    <!-- Icono de éxito -->
+    <div class="flex justify-center mb-4">
+      <div
+        class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center"
+      >
+        <svg
+          class="w-8 h-8 text-green-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+    </div>
+
+    <h3 class="text-2xl font-bold mb-2 text-center text-gray-800">
+      ¡Participación Confirmada! 🎉
+    </h3>
+    <p class="text-center text-gray-600 mb-6">
+      Comparte tu código y gana $0.5 por cada amigo que invite
+    </p>
+
+    <!-- Código de referido -->
+    <div
+      class="bg-gradient-to-br from-pink-50 to-purple-50 border-2 border-primary rounded-xl p-6 mb-6"
+    >
+      <p
+        class="text-xs font-semibold text-gray-500 uppercase tracking-wide text-center mb-2"
+      >
+        Tu Código de Referido
+      </p>
+      <p
+        id="referral-code-display"
+        class="text-3xl font-bold text-primary text-center mb-4 font-mono tracking-wider"
+      >
+        LOADING...
+      </p>
+
+      <!-- Botón de compartir -->
+      <button
+        id="share-referral-btn"
+        type="button"
+        class="w-full bg-gradient-cta text-white font-semibold py-3 px-6 rounded-full hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+          ></path>
+        </svg>
+        <span id="share-btn-text">Compartir Link</span>
+      </button>
+    </div>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <p class="text-sm text-blue-800 text-center">
+        <strong>¿Cómo funciona?</strong><br />
+        Con solo 4 referidos recuperas tu inversión completa de $2
+      </p>
+    </div>
+  </div>
+</div>
+
 <style>
   .number-grid {
     display: grid;
@@ -347,6 +442,28 @@ const unavailableDataset = unavailableNumbers.join(",");
   }
   #pago-modal:not([open]):not(.show) {
     display: none;
+  }
+
+  #success-modal.show {
+    display: flex;
+  }
+  #success-modal:not(.show) {
+    display: none;
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
   }
 </style>
 
@@ -584,21 +701,6 @@ const unavailableDataset = unavailableNumbers.join(",");
           paymentMsg.className = "text-center text-sm text-green-600 mt-2";
           paymentMsg.textContent = "¡Participación confirmada exitosamente!";
 
-          // Mostrar código de referido si está disponible
-          if (data.data?.participant?.referral_code) {
-            setTimeout(() => {
-              alert(
-                `¡Participación confirmada!\n\nTu código de referido es: ${data.data.participant.referral_code}\n\nComparte este código con tus amigos para ganar $0.5 por cada participante que invite.`
-              );
-            }, 100);
-          } else {
-            setTimeout(() => {
-              alert(
-                `¡Participación confirmada! Te enviaremos el código de referido próximamente. ¡Gracias!`
-              );
-            }, 100);
-          }
-
           closeModal();
 
           // Limpia todo
@@ -621,6 +723,19 @@ const unavailableDataset = unavailableNumbers.join(",");
           await fetchUnavailableNumbersFromAPI();
           renderPicked();
           document.getElementById("participate-form").reset();
+
+          // Mostrar modal de éxito con código de referido
+          const referralCode = data.data?.participant?.referral_code;
+          if (referralCode) {
+            showSuccessModal(referralCode);
+          } else {
+            // Fallback si no hay código
+            setTimeout(() => {
+              alert(
+                `¡Participación confirmada! Te enviaremos el código de referido próximamente. ¡Gracias!`
+              );
+            }, 100);
+          }
         } else {
           // Manejar errores de la API
           const numbersTakenError = data.data?.numbers_taken ?? [];
@@ -665,5 +780,155 @@ const unavailableDataset = unavailableNumbers.join(",");
         closeModal();
       }
     });
+
+    // ===== MODAL DE ÉXITO CON CÓDIGO DE REFERIDO =====
+    const successModal = document.getElementById("success-modal");
+    const successModalClose = document.getElementById("success-modal-close");
+    const referralCodeDisplay = document.getElementById(
+      "referral-code-display"
+    );
+    const shareReferralBtn = document.getElementById("share-referral-btn");
+    const shareBtnText = document.getElementById("share-btn-text");
+
+    let currentReferralCode = "";
+    let currentReferralLink = "";
+
+    function showSuccessModal(referralCode) {
+      currentReferralCode = referralCode;
+      currentReferralLink = `https://sorteosmdb.com/?r=${referralCode}`;
+
+      if (referralCodeDisplay) {
+        referralCodeDisplay.textContent = referralCode;
+      }
+
+      if (successModal) {
+        successModal.classList.add("show");
+        document.body.style.overflow = "hidden";
+      }
+    }
+
+    function closeSuccessModal() {
+      if (successModal) {
+        successModal.classList.remove("show");
+        document.body.style.overflow = "";
+      }
+    }
+
+    // Cerrar modal de éxito
+    if (successModalClose) {
+      successModalClose.addEventListener("click", closeSuccessModal);
+    }
+
+    // Cerrar al hacer click fuera del modal
+    if (successModal) {
+      successModal.addEventListener("click", (e) => {
+        if (e.target === successModal) {
+          closeSuccessModal();
+        }
+      });
+    }
+
+    // Cerrar con tecla Escape
+    window.addEventListener("keyup", (e) => {
+      if (
+        successModal?.classList.contains("show") &&
+        (e.key === "Escape" || e.keyCode === 27)
+      ) {
+        closeSuccessModal();
+      }
+    });
+
+    // ===== FUNCIONALIDAD DE COMPARTIR =====
+    async function shareReferralLink() {
+      const shareData = {
+        title: "¡Únete al Sorteo Md'B!",
+        text: `¡Participa en el sorteo y gana increíbles premios! Usa mi código de referido: ${currentReferralCode}`,
+        url: currentReferralLink,
+      };
+
+      // Verificar si Web Share API está disponible
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+          // Cambiar texto del botón temporalmente
+          if (shareBtnText) {
+            const originalText = shareBtnText.textContent;
+            shareBtnText.textContent = "¡Compartido!";
+            setTimeout(() => {
+              shareBtnText.textContent = originalText;
+            }, 2000);
+          }
+        } catch (err) {
+          // Si el usuario cancela, no hacer nada
+          if (err.name !== "AbortError") {
+            console.error("Error al compartir:", err);
+            // Fallback a copiar al portapapeles
+            copyToClipboard();
+          }
+        }
+      } else {
+        // Fallback: copiar al portapapeles
+        copyToClipboard();
+      }
+    }
+
+    function copyToClipboard() {
+      // Intentar usar la API moderna de clipboard
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(currentReferralLink)
+          .then(() => {
+            if (shareBtnText) {
+              const originalText = shareBtnText.textContent;
+              shareBtnText.textContent = "¡Link copiado!";
+              setTimeout(() => {
+                shareBtnText.textContent = originalText;
+              }, 2000);
+            }
+          })
+          .catch((err) => {
+            console.error("Error al copiar:", err);
+            // Fallback antiguo
+            fallbackCopyToClipboard();
+          });
+      } else {
+        // Fallback antiguo para navegadores que no soportan clipboard API
+        fallbackCopyToClipboard();
+      }
+    }
+
+    function fallbackCopyToClipboard() {
+      const textArea = document.createElement("textarea");
+      textArea.value = currentReferralLink;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        document.execCommand("copy");
+        if (shareBtnText) {
+          const originalText = shareBtnText.textContent;
+          shareBtnText.textContent = "¡Link copiado!";
+          setTimeout(() => {
+            shareBtnText.textContent = originalText;
+          }, 2000);
+        }
+      } catch (err) {
+        console.error("Error al copiar:", err);
+        alert(
+          "No se pudo copiar el link. Por favor, cópialo manualmente: " +
+            currentReferralLink
+        );
+      }
+
+      document.body.removeChild(textArea);
+    }
+
+    // Event listener para el botón de compartir
+    if (shareReferralBtn) {
+      shareReferralBtn.addEventListener("click", shareReferralLink);
+    }
   });
 </script>

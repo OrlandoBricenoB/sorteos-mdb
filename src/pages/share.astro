@@ -1,0 +1,323 @@
+---
+// Página para compartir código de referido
+// La lógica para obtener el 'code' y generar el 'referralLink' se ha movido al cliente
+// ya que Astro.url.searchParams es para SSR y no para SSG en tiempo de ejecución del navegador.
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compartir Código de Referido - Sorteos Md'B</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #fef7f7 0%, #fff5f8 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        padding: 40px 30px;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(
+          135deg,
+          hsl(340, 82%, 67%),
+          hsl(330, 81%, 60%)
+        );
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        font-size: 40px;
+      }
+
+      h1 {
+        font-size: 28px;
+        color: #1f2937;
+        margin-bottom: 12px;
+        font-weight: 700;
+      }
+
+      p {
+        color: #6b7280;
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+
+      .code-box {
+        background: linear-gradient(
+          135deg,
+          hsl(350, 100%, 95%),
+          hsl(340, 100%, 97%)
+        );
+        border: 2px solid hsl(340, 82%, 67%);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+
+      .code-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #9ca3af;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .code {
+        font-size: 32px;
+        font-weight: 700;
+        color: hsl(340, 82%, 67%);
+        font-family: "Courier New", monospace;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: linear-gradient(
+          135deg,
+          hsl(340, 82%, 67%),
+          hsl(330, 81%, 60%)
+        );
+        color: white;
+        border: none;
+        padding: 16px 32px;
+        border-radius: 50px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(340, 82%, 67%, 0.3);
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(340, 82%, 67%, 0.4);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .link-box {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 24px;
+        word-break: break-all;
+      }
+
+      .link-label {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-bottom: 8px;
+      }
+
+      .link {
+        color: hsl(340, 82%, 67%);
+        font-size: 14px;
+        text-decoration: none;
+      }
+
+      .info-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 24px;
+        font-size: 14px;
+        color: #1e40af;
+        line-height: 1.6;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .container {
+        animation: fadeIn 0.5s ease-out;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">🎉</div>
+      <h1>¡Comparte y Gana!</h1>
+      <p>
+        Comparte tu código de referido y gana $0.5 por cada amigo que participe
+      </p>
+
+      <div class="code-box">
+        <div class="code-label">Tu Código de Referido</div>
+        <div class="code" id="referral-code">Cargando...</div>
+
+        <button id="share-btn" class="btn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+            ></path>
+          </svg>
+          <button id="btn-text">Compartir Link</button>
+        </button>
+      </div>
+
+      <div class="link-box">
+        <div class="link-label">O copia este link:</div>
+        <a href="#" class="link" id="referral-link-display">Cargando...</a>
+      </div>
+
+      <div class="info-box">
+        <strong>¿Cómo funciona?</strong><br />
+        Con solo 4 referidos recuperas tu inversión completa de $2
+      </div>
+    </div>
+
+    <script>
+      const shareBtn = document.getElementById("share-btn")!;
+      const btnText = document.getElementById("btn-text")!;
+      const referralCodeElement = document.getElementById("referral-code")!;
+      const referralLinkDisplay = document.getElementById(
+        "referral-link-display"
+      )! as HTMLAnchorElement;
+
+      // Obtener el código de referido del query string en el cliente
+      const searchParams = new URLSearchParams(window.location.search);
+      const code = searchParams.get("code");
+
+      // Construir el link de referido client-side
+      const referralLink = code
+        ? `https://sorteosmdb.com/?r=${code}`
+        : "https://sorteosmdb.com/";
+
+      // Redirigir si no hay código
+      if (!code) {
+        window.location.href = "/";
+      }
+
+      // Actualizar el DOM con el código y el link
+      if (referralCodeElement) {
+        referralCodeElement.textContent = code || "N/A"; // Mostrar N/A si no hay código
+      }
+      if (referralLinkDisplay) {
+        referralLinkDisplay.href = referralLink;
+        referralLinkDisplay.textContent = referralLink;
+      }
+
+      async function shareReferral() {
+        const shareData = {
+          title: "¡Únete a Sorteos Md'B!",
+          text: `¡Participa en el sorteo y haz que tu cabello brille esta navidad!`,
+          url: referralLink,
+        };
+
+        // Verificar si Web Share API está disponible
+        try {
+          await navigator.share(shareData);
+          alert("Compartido");
+          btnText.textContent = "¡Compartido!";
+          setTimeout(() => {
+            btnText.textContent = "Compartir Link";
+          }, 2000);
+        } catch (err) {
+          alert(JSON.stringify(err));
+          if ((err as Error)?.name !== "AbortError") {
+            console.error("Error al compartir:", err);
+            copyToClipboard();
+          }
+        }
+      }
+
+      function copyToClipboard() {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard
+            .writeText(referralLink)
+            .then(() => {
+              btnText.textContent = "¡Link copiado!";
+              setTimeout(() => {
+                btnText.textContent = "Compartir Link";
+              }, 2000);
+            })
+            .catch((err) => {
+              console.error("Error al copiar:", err);
+              fallbackCopy();
+            });
+        } else {
+          fallbackCopy();
+        }
+      }
+
+      function fallbackCopy() {
+        const textArea = document.createElement("textarea");
+        textArea.value = referralLink;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          document.execCommand("copy");
+          btnText.textContent = "¡Link copiado!";
+          setTimeout(() => {
+            btnText.textContent = "Compartir Link";
+          }, 2000);
+        } catch (err) {
+          console.error("Error al copiar:", err);
+          alert("No se pudo copiar el link. Por favor, cópialo manualmente.");
+        }
+
+        document.body.removeChild(textArea);
+      }
+
+      shareBtn.addEventListener("click", shareReferral);
+    </script>
+  </body>
+</html>
