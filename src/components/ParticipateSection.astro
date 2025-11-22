@@ -138,17 +138,17 @@ const unavailableDataset = unavailableNumbers.join(",");
 
 <!-- Modal de pago y comprobante -->
 <div
-  id="pago-modal"
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden"
+  id="payment-modal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden p-4"
   tabindex="-1"
   role="dialog"
   aria-modal="true"
 >
   <div
-    class="bg-white rounded-2xl shadow-lg w-full max-w-lg mx-auto p-8 relative"
+    class="bg-white rounded-2xl shadow-lg w-full max-w-2xl mx-auto p-6 md:p-8 relative max-h-[90vh] overflow-y-auto"
   >
     <button
-      id="pago-modal-close"
+      id="payment-modal-close"
       type="button"
       class="absolute top-2 right-2 px-3 py-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none"
       aria-label="Cerrar"
@@ -436,11 +436,11 @@ const unavailableDataset = unavailableNumbers.join(",");
     opacity: 0.6;
     pointer-events: none;
   }
-  #pago-modal[open],
-  #pago-modal.show {
+  #payment-modal[open],
+  #payment-modal.show {
     display: flex;
   }
-  #pago-modal:not([open]):not(.show) {
+  #payment-modal:not([open]):not(.show) {
     display: none;
   }
 
@@ -464,6 +464,29 @@ const unavailableDataset = unavailableNumbers.join(",");
 
   .animate-scale-in {
     animation: scaleIn 0.3s ease-out;
+  }
+
+  /* Estilos para el scroll del modal */
+  #payment-modal > div {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(340 82% 67% / 0.3) transparent;
+  }
+
+  #payment-modal > div::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #payment-modal > div::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  #payment-modal > div::-webkit-scrollbar-thumb {
+    background-color: hsl(340 82% 67% / 0.3);
+    border-radius: 4px;
+  }
+
+  #payment-modal > div::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(340 82% 67% / 0.5);
   }
 </style>
 
@@ -591,8 +614,8 @@ const unavailableDataset = unavailableNumbers.join(",");
     fetchUnavailableNumbersFromAPI();
 
     // Modal
-    const modal = document.getElementById("pago-modal");
-    const closeModalButton = document.getElementById("pago-modal-close");
+    const modal = document.getElementById("payment-modal");
+    const closeModalButton = document.getElementById("payment-modal-close");
     const paymentForm = document.getElementById("confirm-payment-form");
     const paymentMsg = document.getElementById("payment-form-msg");
 
