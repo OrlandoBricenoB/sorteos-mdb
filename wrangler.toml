@@ -1,17 +1,11 @@
-main = "dist/_worker.js/index.js"
 name = "sorteos-mdb"
-compatibility_date = "2025-03-25"
-compatibility_flags = [
-  "nodejs_compat",
-  "global_fetch_strictly_public"
-]
+compatibility_date = "2024-11-22"
+pages_build_output_dir = "./dist"
 
-[assets]
-binding = "ASSETS"
-directory = "./dist"
+# Configuración para Cloudflare Pages
+[build]
+command = "pnpm build"
 
-[observability]
-enabled = true
-
-[vars]
-SESSION = "session"
+# Variables de entorno (puedes configurarlas en el dashboard de Cloudflare)
+# [env.production]
+# API_BASE_URL = "https://api.sorteosmdb.com"
