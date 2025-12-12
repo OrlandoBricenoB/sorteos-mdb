@@ -1,0 +1,332 @@
+---
+import Button from "./ui/Button.astro";
+
+const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
+const RAFFLE_ID = "1";
+const RAFFLE_SLUG = "l-oreal-glycolic-gloss";
+
+// Fetch initial participants (taken numbers) server-side for initial render
+let participants = [];
+try {
+  const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`);
+  const data = await resp.json();
+  if (resp.ok && data.ok) {
+    participants = Array.isArray(data.data?.numbers)
+      ? data.data.numbers.filter(
+          (n: any) => typeof n === "number" && !Number.isNaN(n)
+        )
+      : [];
+  }
+} catch (err) {
+  console.error("Error fetching participants for roulette:", err);
+  participants = [];
+}
+
+const participantsJson = JSON.stringify(participants);
+
+// Check Raffle Status
+let canSpin = false;
+try {
+  const statusResp = await fetch(
+    `${API_BASE_URL}/raffles/${RAFFLE_SLUG}/status`
+  );
+  const statusData = await statusResp.json();
+
+  if (statusResp.ok && statusData.ok && statusData.data?.end_at) {
+    const endAt = new Date(statusData.data.end_at);
+
+    // Venezuela Time Logic (GMT-4)
+    const now = new Date();
+    const venezuelaOffset = -4 * 60 * 60 * 1000;
+    const nowVenezuela = new Date(now.getTime() + venezuelaOffset);
+
+    // Assuming endAt is treated as UTC in Date object but represents local time
+    // We shift it to compare "wall clock" times
+    // If endAt is valid
+    if (!isNaN(endAt.getTime())) {
+      // We want to know if nowVenezuela >= endAt (wall clock)
+      // Since we are in Node/Deno/Bun (SSR), new Date(string) might behave differently depending on env TZ
+      // But usually ISO string without TZ is UTC.
+      // Let's assume consistent behavior with Worker.
+
+      // If endAt is "2025-12-11T20:00:00", Date parses it as UTC 20:00.
+      // nowVenezuela is shifted UTC to match VET wall clock.
+      // So we compare directly.
+
+      if (nowVenezuela >= endAt) {
+        canSpin = true;
+      }
+    }
+  }
+} catch (err) {
+  console.error("Error checking raffle status:", err);
+  // Default to false or true? User said "desactivado en caso de no ser aún la fecha".
+  // So default false is safer.
+}
+---
+
+<section
+  id="roulette-section"
+  class="py-20 bg-gradient-to-b from-background to-secondary/20 overflow-hidden relative"
+>
+  <div
+    class="absolute inset-0 bg-[url('/assets/pattern.svg')] opacity-5 pointer-events-none"
+  >
+  </div>
+
+  <div class="container mx-auto px-4 relative z-10">
+    <div class="text-center mb-12 space-y-4">
+      <h2 class="font-playfair text-4xl md:text-5xl font-bold text-foreground">
+        La Ruleta Ganadora
+      </h2>
+      <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+        ¡Descubre si eres el afortunado ganador! Gira la ruleta para revelar el
+        número premiado.
+      </p>
+    </div>
+
+    <div class="flex flex-col items-center justify-center gap-8">
+      <div
+        class="relative w-[300px] h-[300px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px]"
+      >
+        <!-- Pointer -->
+        <div
+          id="roulette-pointer"
+          class={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 z-20 w-8 h-12 md:w-10 md:h-16 filter drop-shadow-lg ${!canSpin ? "animate-bounce" : ""}`}
+        >
+          <svg
+            viewBox="0 0 40 60"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-full h-full text-primary"
+          >
+            <path d="M20 60L0 0H40L20 60Z" fill="currentColor"></path>
+          </svg>
+        </div>
+
+        <!-- Wheel Container -->
+        <div
+          class="w-full h-full rounded-full shadow-2xl border-8 border-white bg-white relative overflow-hidden transition-transform duration-[5000ms] cubic-bezier(0.25, 0.1, 0.25, 1)"
+          id="roulette-wheel-container"
+        >
+          <canvas id="roulette-canvas" class="w-full h-full"></canvas>
+        </div>
+
+        <!-- Center Cap -->
+        <div
+          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 md:w-16 md:h-16 bg-white rounded-full shadow-lg z-10 flex items-center justify-center border-4 border-primary"
+        >
+          <span
+            class="hidden md:block text-primary font-bold text-lg md:text-xl"
+            >Md'B</span
+          >
+          <span
+            class="block md:hidden text-primary font-bold text-lg md:text-xl"
+            >M</span
+          >
+        </div>
+      </div>
+
+      <div class="flex flex-col items-center gap-4 mt-8">
+        <Button
+          id="spin-btn"
+          size="lg"
+          disabled={!canSpin}
+          class="bg-gradient-cta text-white font-bold text-xl px-12 py-6 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {canSpin ? "GIRAR RULETA" : "PRÓXIMAMENTE"}
+        </Button>
+        <p
+          id="roulette-message"
+          class="text-lg font-medium text-muted-foreground min-h-[2rem]"
+        >
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ participantsJson, API_BASE_URL, RAFFLE_ID, RAFFLE_SLUG }}
+>
+  const canvas = document.getElementById("roulette-canvas");
+  const container = document.getElementById("roulette-wheel-container");
+  const spinBtn = document.getElementById("spin-btn");
+  const messageEl = document.getElementById("roulette-message");
+
+  let participants = JSON.parse(participantsJson);
+  // If no participants, add some placeholders for visual if needed, or handle empty state
+  if (participants.length === 0) {
+    participants = [1, 2, 3, 4, 5, 6, 7, 8]; // Fallback for empty state visualization
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  // High DPI scaling
+  const dpr = window.devicePixelRatio || 1;
+  const rect = container.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  let centerX = rect.width / 2;
+  let centerY = rect.height / 2;
+  let radius = rect.width / 2;
+
+  const colors = ["#FF6B9D", "#FF8E8E", "#FFB5B5", "#FFD1D1", "#FFF0F0"];
+  const textColors = ["#ffffff", "#ffffff", "#4a041d", "#4a041d", "#4a041d"];
+
+  function drawWheel() {
+    const numSegments = participants.length;
+    const arcSize = (2 * Math.PI) / numSegments;
+
+    participants.forEach((number, i) => {
+      const angle = i * arcSize;
+
+      ctx.beginPath();
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, angle, angle + arcSize);
+      ctx.lineTo(centerX, centerY);
+      ctx.fill();
+      ctx.stroke();
+
+      // Text
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(angle + arcSize / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = textColors[i % textColors.length];
+      ctx.font = "bold 14px Inter, sans-serif";
+      ctx.fillText(number.toString(), radius - 20, 5);
+      ctx.restore();
+    });
+  }
+
+  drawWheel();
+
+  let currentRotation = 0;
+
+  spinBtn.addEventListener("click", async () => {
+    spinBtn.disabled = true;
+    messageEl.textContent = "Consultando ganador...";
+    messageEl.className = "text-lg font-medium text-muted-foreground";
+
+    try {
+      // Fetch winner from backend
+      const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_SLUG}/winner`);
+      const data = await resp.json();
+
+      // Check for NOT_AVAILABLE message in various likely places
+      if (
+        data.message === "NOT_AVAILABLE" ||
+        data.data?.message === "NOT_AVAILABLE" ||
+        data.code === "NOT_AVAILABLE"
+      ) {
+        messageEl.textContent = "Aún no es la fecha de revelación del sorteo.";
+        messageEl.className = "text-lg font-bold text-orange-500";
+        spinBtn.disabled = false;
+        return;
+      }
+
+      // Try to find the winner in likely places
+      let winningNumber = data.data?.number;
+
+      if (winningNumber === undefined || winningNumber === null) {
+        console.error("Respuesta inesperada:", data);
+        throw new Error("No winner data received");
+      }
+
+      // Ensure it's a number
+      winningNumber = Number(winningNumber);
+
+      const winningIndex = participants.indexOf(winningNumber);
+
+      if (winningIndex === -1) {
+        messageEl.textContent = `El número ganador es ${winningNumber}, pero no está en la lista visible.`;
+        spinBtn.disabled = false;
+        return;
+      }
+
+      // Calculate rotation to land on the winner
+      // The pointer is at the top (270 degrees or -90 degrees in canvas logic, but 0 in CSS rotate is usually top if we align it right)
+      // Actually, let's keep it simple. 0 degrees is usually 3 o'clock in canvas.
+      // Pointer is at Top (12 o'clock).
+      // We need to rotate the wheel so the winning segment aligns with the top.
+
+      const numSegments = participants.length;
+      const segmentAngle = 360 / numSegments;
+
+      // Random extra spins (at least 5)
+      const extraSpins = 5 * 360;
+
+      // Calculate where the winning segment is currently
+      // Segment i starts at i * segmentAngle
+      // Center of segment i is at i * segmentAngle + segmentAngle/2
+      // We want this center to be at -90 degrees (Top)
+
+      // Target rotation:
+      // currentRotation + extraSpins + (offset to align winner)
+
+      // Let's say we want the final rotation to be R.
+      // The position of segment i at rotation R is: (i * segmentAngle + R) % 360
+      // We want this to be 270 (Top).
+      // i * segmentAngle + R = 270
+      // R = 270 - i * segmentAngle
+
+      // To ensure we always spin forward:
+      const targetAngleBase =
+        270 - winningIndex * segmentAngle - segmentAngle / 2;
+
+      // Adjust targetAngleBase to be > currentRotation
+      let targetRotation =
+        currentRotation +
+        extraSpins +
+        (targetAngleBase - (currentRotation % 360));
+
+      // Ensure it's always adding positive rotation
+      if (targetRotation <= currentRotation) {
+        targetRotation += 360;
+      }
+
+      // Apply rotation via CSS
+      container.style.transform = `rotate(${targetRotation}deg)`;
+      currentRotation = targetRotation;
+
+      // Stop pointer animation
+      const pointer = document.getElementById("roulette-pointer");
+      if (pointer) {
+        pointer.classList.remove("animate-bounce");
+      }
+
+      messageEl.textContent = "¡Girando!...";
+
+      // Wait for animation to finish (5s)
+      setTimeout(() => {
+        messageEl.textContent = `¡El número ganador es el ${winningNumber}! 🎉`;
+        messageEl.className = "text-2xl font-bold text-primary animate-bounce";
+        // Launch confetti or something here if desired
+        spinBtn.disabled = false;
+      }, 5000);
+    } catch (err) {
+      console.error(err);
+      messageEl.textContent = "Hubo un error al consultar el ganador.";
+      messageEl.className = "text-lg font-bold text-red-500";
+      spinBtn.disabled = false;
+    }
+  });
+
+  // Handle resize
+  window.addEventListener("resize", () => {
+    const rect = container.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    // Update center and radius based on new dimensions
+    centerX = rect.width / 2;
+    centerY = rect.height / 2;
+    radius = rect.width / 2;
+
+    drawWheel();
+  });
+</script>
