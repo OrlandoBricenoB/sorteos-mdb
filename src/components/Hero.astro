@@ -53,6 +53,8 @@ try {
 } catch (error) {
   console.error("Error fetching raffle status:", error);
 }
+
+const dateToTest = new Date().toISOString();
 ---
 
 <section
@@ -72,7 +74,9 @@ try {
           class="inline-flex items-center gap-2 bg-secondary px-4 py-2 rounded-full shadow-soft"
         >
           <Heart class="w-5 h-5 text-primary" />
-          <span class="text-sm font-medium text-foreground">Sorteos Md'B</span>
+          <span class="text-sm font-medium text-foreground"
+            >Sorteos Md'B {dateToTest}</span
+          >
         </div>
 
         <h1
@@ -271,4 +275,7 @@ try {
       });
     });
   });
+
+  const dateToTest = new Date().toISOString();
+  console.log({ dateToTest });
 </script>
