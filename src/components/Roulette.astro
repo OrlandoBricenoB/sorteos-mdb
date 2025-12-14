@@ -35,11 +35,7 @@ try {
 
   if (statusResp.ok && statusData.ok && statusData.data?.end_at) {
     const endAt = new Date(statusData.data.end_at).getTime();
-    const date = new Date();
-    const nowVenezuelaString = date.toLocaleString("en-US", {
-      timeZone: "America/Caracas",
-    });
-    const now = new Date(nowVenezuelaString).getTime();
+    const now = new Date().getTime();
 
     if (!isNaN(endAt) && now >= endAt) {
       canSpin = true;
