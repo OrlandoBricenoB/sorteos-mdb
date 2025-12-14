@@ -1,7 +1,7 @@
 ---
 import Button from "./ui/Button.astro";
-import Sparkles from "./icons/Sparkles.astro";
 import Heart from "./icons/Heart.astro";
+import { VENEZUELA_OFFSET } from "../constants/time";
 
 const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
 const RAFFLE_SLUG = "l-oreal-glycolic-gloss";
@@ -19,7 +19,7 @@ try {
   if (resp.ok && data.ok && data.data?.end_at) {
     const endDate = new Date(data.data.end_at);
     targetDateTimestamp = endDate.getTime();
-    const now = new Date().getTime();
+    const now = new Date().getTime() + VENEZUELA_OFFSET;
     const distance = targetDateTimestamp - now;
 
     if (distance > 0) {
