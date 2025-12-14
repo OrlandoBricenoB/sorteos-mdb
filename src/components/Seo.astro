@@ -37,7 +37,7 @@ const {
   lang = "es",
 } = Astro.props;
 
-const fullTitle = siteName ? `${title} | ${siteName}` : title;
+const fullTitle = siteName ? `${siteName} | ${title}` : title;
 const baseUrl =
   Astro.site ||
   (Astro.url ? new URL(Astro.url.pathname, Astro.url.origin).href : "");
