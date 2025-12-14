@@ -30,32 +30,15 @@ try {
   const statusResp = await fetch(
     `${API_BASE_URL}/raffles/${RAFFLE_SLUG}/status`
   );
-  const statusData = await statusResp.json();
+  const rawText = await statusResp.text();
+  const statusData = JSON.parse(rawText);
 
   if (statusResp.ok && statusData.ok && statusData.data?.end_at) {
     const endAt = new Date(statusData.data.end_at);
-
-    // Venezuela Time Logic (GMT-4)
     const now = new Date();
-    const venezuelaOffset = -4 * 60 * 60 * 1000;
-    const nowVenezuela = new Date(now.getTime() + venezuelaOffset);
 
-    // Assuming endAt is treated as UTC in Date object but represents local time
-    // We shift it to compare "wall clock" times
-    // If endAt is valid
-    if (!isNaN(endAt.getTime())) {
-      // We want to know if nowVenezuela >= endAt (wall clock)
-      // Since we are in Node/Deno/Bun (SSR), new Date(string) might behave differently depending on env TZ
-      // But usually ISO string without TZ is UTC.
-      // Let's assume consistent behavior with Worker.
-
-      // If endAt is "2025-12-11T20:00:00", Date parses it as UTC 20:00.
-      // nowVenezuela is shifted UTC to match VET wall clock.
-      // So we compare directly.
-
-      if (nowVenezuela >= endAt) {
-        canSpin = true;
-      }
+    if (!isNaN(endAt.getTime()) && now >= endAt) {
+      canSpin = true;
     }
   }
 } catch (err) {
