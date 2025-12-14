@@ -1,0 +1,241 @@
+---
+const winner = {
+  name: "María González",
+  image:
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria&backgroundColor=ffdfbf",
+  quote:
+    "¡Increíble experiencia! Nunca pensé que ganaría. Los productos son maravillosos y llegaron súper rápido. ¡Gracias Sorteos Md'B!",
+  location: "Caracas, Venezuela",
+  prize: "L'Oréal Paris - Glycolic Gloss",
+};
+
+const topSellers = [
+  {
+    name: "Anny Rondón",
+    tickets: 150,
+    image:
+      "https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos&backgroundColor=c0aede",
+    rank: 1,
+    description:
+      "Disfruté mucho invitando a mis amigos y familiares, ¡Y ganar $0.5 por cada uno fue un gran incentivo!",
+  },
+  {
+    name: "Karina de Barrios",
+    tickets: 120,
+    image:
+      "https://api.dicebear.com/7.x/avataaars/svg?seed=Ana&backgroundColor=b6e3f4",
+    rank: 2,
+    description:
+      "Fue genial ver a mis conocidos unirse y saber que cada invitación me sumaba $0.5. ¡Una experiencia muy gratificante!",
+  },
+];
+---
+
+<section class="py-24 relative overflow-hidden">
+  <!-- Decorative Background -->
+  <div
+    class="absolute inset-0 bg-gradient-to-b from-background via-secondary/30 to-background pointer-events-none"
+  >
+  </div>
+  <div
+    class="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 pointer-events-none"
+  >
+  </div>
+  <div
+    class="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl translate-y-1/2 pointer-events-none"
+  >
+  </div>
+
+  <div class="container mx-auto px-4 relative z-10">
+    <div class="text-center mb-16 space-y-4">
+      <h2 class="font-playfair text-4xl md:text-5xl font-bold">
+        <span
+          class="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"
+        >
+          Salón de la fama
+        </span>
+      </h2>
+      <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
+        Celebrando a nuestros ganadores y a quienes hacen posible estos sorteos.
+      </p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-12">
+      <!-- Winner Section -->
+      <div class="group relative">
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-xl opacity-0 transition-opacity duration-500"
+        >
+        </div>
+        <div
+          class="relative bg-card/60 backdrop-blur-md border border-border/50 rounded-3xl p-8 shadow-card transition-all duration-300 h-full flex flex-col"
+        >
+          <div
+            class="absolute -top-6 left-8 bg-gradient-to-r from-primary to-accent text-white px-6 py-2 rounded-full shadow-lg font-bold text-sm tracking-wide uppercase flex items-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              ><path
+                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm14.024-.983a1.125 1.125 0 010 1.966l-5.603 3.113a1.125 1.125 0 01-1.669-.983V7.902a1.125 1.125 0 011.669-.983l5.603 3.113z"
+              ></path></svg
+            >
+            Ganador Anterior
+          </div>
+
+          <div class="mt-6 flex flex-col items-center text-center flex-grow">
+            <div class="relative w-32 h-32 mb-6">
+              <div
+                class="absolute inset-0 bg-primary/20 rounded-full animate-pulse"
+              >
+              </div>
+              <img
+                src={winner.image}
+                alt={winner.name}
+                class="w-full h-full rounded-full object-cover border-4 border-background shadow-lg relative z-10"
+              />
+              <div
+                class="absolute -bottom-2 -right-2 bg-yellow-400 text-yellow-900 p-2 rounded-full shadow-md"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  ><path
+                    fill-rule="evenodd"
+                    d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                    clip-rule="evenodd"></path></svg
+                >
+              </div>
+            </div>
+
+            <blockquote
+              class="text-xl md:text-2xl font-playfair italic text-foreground mb-6 relative"
+            >
+              <span
+                class="text-6xl text-primary/20 absolute -top-8 -left-4 font-serif"
+                >"</span
+              >
+              {winner.quote}
+              <span
+                class="text-6xl text-primary/20 absolute -bottom-12 -right-4 font-serif"
+                >"</span
+              >
+            </blockquote>
+
+            <div class="mt-auto">
+              <h3 class="text-xl font-bold text-foreground">{winner.name}</h3>
+              <p class="text-sm text-muted-foreground">{winner.location}</p>
+              <div
+                class="mt-2 inline-block bg-secondary px-3 py-1 rounded-full text-xs font-medium text-secondary-foreground"
+              >
+                Premio: {winner.prize}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Sellers Section -->
+      <div class="group relative">
+        <div
+          class="absolute inset-0 bg-gradient-to-bl from-accent/20 to-primary/20 rounded-3xl blur-xl opacity-0 transition-opacity duration-500"
+        >
+        </div>
+        <div
+          class="relative bg-card/60 backdrop-blur-md border border-border/50 rounded-3xl p-8 shadow-card transition-all duration-300 h-full"
+        >
+          <div
+            class="absolute -top-6 right-8 bg-gradient-to-r from-accent to-primary text-white px-6 py-2 rounded-full shadow-lg font-bold text-sm tracking-wide uppercase flex items-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              ><path
+                fill-rule="evenodd"
+                d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z"
+                clip-rule="evenodd"></path></svg
+            >
+            Mejores Vendedores
+          </div>
+
+          <div class="mt-6 space-y-8">
+            {
+              topSellers.map((seller, index) => (
+                <div class="flex items-center gap-6 p-4 rounded-2xl hover:bg-secondary/50 transition-colors duration-300">
+                  <div class="relative flex-shrink-0">
+                    <div
+                      class={`absolute -top-2 -left-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-lg ${index === 0 ? "bg-yellow-400 ring-4 ring-yellow-400/30" : "bg-gray-300 ring-4 ring-gray-300/30"}`}
+                    >
+                      {seller.rank}
+                    </div>
+                    <img
+                      src={seller.image}
+                      alt={seller.name}
+                      class="w-20 h-20 rounded-full object-cover border-2 border-border"
+                    />
+                  </div>
+
+                  <div class="flex-grow">
+                    <h3 class="text-xl font-bold text-foreground">
+                      {seller.name}
+                    </h3>
+                    {/* <div class="flex items-center gap-2 mt-1">
+                      <div class="h-2 flex-grow bg-muted rounded-full overflow-hidden">
+                        <div
+                          class="h-full bg-gradient-to-r from-primary to-accent"
+                          style={`width: ${(seller.tickets / 200) * 100}%`}
+                        />
+                      </div>
+                      <span class="text-sm font-bold text-primary">
+                        {seller.tickets} tickets
+                      </span>
+                    </div> */}
+                    <p class="text-xs text-muted-foreground mt-1">
+                      {index === 0
+                        ? "¡Líder de ventas!"
+                        : "¡Excelente desempeño!"}
+                    </p>
+                    <p class="text-sm text-foreground/80 mt-2">
+                      {seller.description}
+                    </p>
+                  </div>
+                </div>
+              ))
+            }
+
+            <div
+              class="mt-8 p-6 bg-gradient-to-r from-secondary to-background rounded-2xl text-center border border-border/50"
+            >
+              <p class="text-foreground font-medium mb-3">
+                ¿Quieres aparecer aquí?
+              </p>
+              <a
+                class="inline-flex items-center gap-2 text-primary font-bold hover:underline cursor-pointer"
+                data-scroll="referral-program"
+              >
+                ¡Usa tu link de referido e invita a tus amigos a participar!
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  ><path d="M5 12h14M12 5l7 7-7 7"></path></svg
+                >
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
