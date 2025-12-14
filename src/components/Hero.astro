@@ -218,7 +218,11 @@ try {
   );
 
   function updateCountdown() {
-    const now = new Date().getTime();
+    const date = new Date();
+    const nowVenezuelaString = date.toLocaleString("en-US", {
+      timeZone: "America/Caracas",
+    });
+    const now = new Date(nowVenezuelaString).getTime();
     const distance = targetDate - now;
 
     if (distance < 0) {
