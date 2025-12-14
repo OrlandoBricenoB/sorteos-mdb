@@ -1,4 +1,5 @@
 ---
+import { VENEZUELA_OFFSET } from "../constants/time";
 import Button from "./ui/Button.astro";
 
 const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
@@ -34,10 +35,10 @@ try {
   const statusData = JSON.parse(rawText);
 
   if (statusResp.ok && statusData.ok && statusData.data?.end_at) {
-    const endAt = new Date(statusData.data.end_at);
-    const now = new Date();
+    const endAt = new Date(statusData.data.end_at).getTime();
+    const now = new Date().getTime() + VENEZUELA_OFFSET;
 
-    if (!isNaN(endAt.getTime()) && now >= endAt) {
+    if (!isNaN(endAt) && now >= endAt) {
       canSpin = true;
     }
   }
