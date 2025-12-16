@@ -2,11 +2,13 @@
 import Button from "./ui/Button.astro";
 
 const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
-const RAFFLE_ID = "1";
-const RAFFLE_SLUG = "l-oreal-glycolic-gloss";
+const RAFFLE_ID = "2";
+const RAFFLE_SLUG = "l-oreal-hidra-hialuronico";
+const TOTAL_NUMBERS = 200;
 
 // Fetch initial participants (taken numbers) server-side for initial render
 let participants = [];
+let soldNumbers = 0;
 try {
   const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`);
   const data = await resp.json();
@@ -16,6 +18,7 @@ try {
           (n: any) => typeof n === "number" && !Number.isNaN(n)
         )
       : [];
+    soldNumbers = participants.length;
   }
 } catch (err) {
   console.error("Error fetching participants for roulette:", err);
@@ -24,28 +27,8 @@ try {
 
 const participantsJson = JSON.stringify(participants);
 
-// Check Raffle Status
-let canSpin = false;
-try {
-  const statusResp = await fetch(
-    `${API_BASE_URL}/raffles/${RAFFLE_SLUG}/status`
-  );
-  const rawText = await statusResp.text();
-  const statusData = JSON.parse(rawText);
-
-  if (statusResp.ok && statusData.ok && statusData.data?.end_at) {
-    const endAt = new Date(statusData.data.end_at).getTime();
-    const now = new Date().getTime();
-
-    if (!isNaN(endAt) && now >= endAt) {
-      canSpin = true;
-    }
-  }
-} catch (err) {
-  console.error("Error checking raffle status:", err);
-  // Default to false or true? User said "desactivado en caso de no ser aún la fecha".
-  // So default false is safer.
-}
+// Check if all numbers are sold (200 numbers)
+const canSpin = soldNumbers >= TOTAL_NUMBERS;
 ---
 
 <section
@@ -60,8 +43,8 @@ try {
         La Ruleta Ganadora
       </h2>
       <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
-        ¡Descubre si eres el afortunado ganador! Gira la ruleta para revelar el
-        número premiado.
+        El ganador será revelado una vez se vendan los 200 números. ¡Gira la
+        ruleta para descubrir si eres el afortunado!
       </p>
     </div>
 
@@ -114,7 +97,7 @@ try {
           disabled={!canSpin}
           class="bg-gradient-cta text-white font-bold text-xl px-12 py-6 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {canSpin ? "GIRAR RULETA" : "PRÓXIMAMENTE"}
+          {canSpin ? "GIRAR RULETA" : `PRONTO`}
         </Button>
         <p
           id="roulette-message"
@@ -136,7 +119,7 @@ try {
   let participants = JSON.parse(participantsJson);
   // If no participants, add some placeholders for visual if needed, or handle empty state
   if (participants.length === 0) {
-    participants = [1, 2, 3, 4, 5, 6, 7, 8]; // Fallback for empty state visualization
+    participants = []; // Fallback for empty state visualization
   }
 
   const ctx = canvas.getContext("2d");
@@ -202,7 +185,8 @@ try {
         data.data?.message === "NOT_AVAILABLE" ||
         data.code === "NOT_AVAILABLE"
       ) {
-        messageEl.textContent = "Aún no es la fecha de revelación del sorteo.";
+        messageEl.textContent =
+          "Aún no se han vendido los 200 números. El ganador será revelado cuando se completen todas las ventas.";
         messageEl.className = "text-lg font-bold text-orange-500";
         spinBtn.disabled = false;
         return;

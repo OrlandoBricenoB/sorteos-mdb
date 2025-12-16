@@ -3,57 +3,37 @@ import Button from "./ui/Button.astro";
 import Heart from "./icons/Heart.astro";
 
 const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
-const RAFFLE_SLUG = "l-oreal-glycolic-gloss";
+const RAFFLE_ID = "2";
+const TOTAL_NUMBERS = 200;
 
-let days = 0;
-let hours = 0;
-let minutes = 0;
-let targetDateTimestamp = new Date("2025-12-15T12:00:00").getTime();
-let dateText = "Compra tus números hasta el 15 de Diciembre de 2025";
+let availableNumbers = 0;
+let soldNumbers = 0;
+let dateText = "El ganador será revelado una vez se vendan los 200 números";
 
 try {
-  const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_SLUG}/status`);
+  const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`);
   const data = await resp.json();
 
-  if (resp.ok && data.ok && data.data?.end_at) {
-    const endDate = new Date(data.data.end_at);
-    targetDateTimestamp = endDate.getTime();
-    const now = new Date().getTime();
-    const distance = targetDateTimestamp - now;
+  if (resp.ok && data.ok && Array.isArray(data.data?.numbers)) {
+    soldNumbers = data.data.numbers.filter(
+      (n: any) => typeof n === "number" && !Number.isNaN(n)
+    ).length;
+    availableNumbers = TOTAL_NUMBERS - soldNumbers;
 
-    if (distance > 0) {
-      days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    if (availableNumbers > 0) {
+      dateText = `Faltan ${availableNumbers} números por venderse para revelar al ganador`;
+    } else {
+      dateText =
+        "¡Todos los números han sido vendidos! Pronto revelaremos al ganador";
     }
-
-    const months = [
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre",
-    ];
-    const day = endDate.getDate();
-    const month = months[endDate.getMonth()];
-    const year = endDate.getFullYear();
-    dateText = `Compra tus números hasta el ${day} de ${month} de ${year}`;
   }
 } catch (error) {
-  console.error("Error fetching raffle status:", error);
+  console.error("Error fetching raffle numbers:", error);
 }
 ---
 
 <section
   id="hero-section"
-  data-target-date={targetDateTimestamp}
   class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero"
 >
   <div
@@ -79,12 +59,13 @@ try {
         </h1>
 
         <h2 class="text-uppercase text-primary text-2xl font-bold">
-          ELVIVE GLYCOLIC GLOSS
+          HIDRA HIALURÓNICO
         </h2>
 
         <p class="text-xl md:text-2xl text-muted-foreground font-light">
           ¡Invierte solo <span class="font-semibold text-primary">$2</span> y participa
-          para ganar productos originales que harán brillar tu cabello toda la navidad!
+          para ganar alguno de los 3 premios que se entregarán al alcanzar a los 200
+          participantes!
         </p>
 
         <div
@@ -119,20 +100,20 @@ try {
             <div class="text-sm text-muted-foreground">Participaciones</div>
           </div>
           <div class="text-center min-w-[90px]">
-            <div class="text-2xl sm:text-3xl font-bold text-primary">+$60</div>
-            <div class="text-sm text-muted-foreground">Valor del Premio</div>
+            <div class="text-2xl sm:text-3xl font-bold text-primary">+$100</div>
+            <div class="text-sm text-muted-foreground">En premios</div>
           </div>
         </div>
       </div>
 
       <div class="relative w-full space-y-6 animate-fade-in">
-        <!-- Countdown arriba de la imagen -->
+        <!-- Contador de números disponibles arriba de la imagen -->
         <div class="bg-transparent rounded-2xl p-6">
           <div class="text-center mb-4">
             <h3
               class="font-playfair text-xl md:text-2xl font-bold text-foreground mb-1"
             >
-              ⏰ ¡Ya falta poco para elegir al ganador!
+              📊 Estado del Sorteo
             </h3>
             <p id="raffle-date-text" class="text-sm text-muted-foreground">
               {dateText}
@@ -141,40 +122,28 @@ try {
           <div
             class="flex flex-row items-center justify-center gap-6 md:gap-10"
           >
-            <!-- Días -->
+            <!-- Números Disponibles -->
             <div class="text-center">
               <div
-                id="days"
-                class="text-3xl md:text-4xl font-extrabold text-primary mb-1"
+                id="available-numbers"
+                class="text-3xl md:text-4xl font-extrabold text-accent mb-1"
               >
-                {days}
+                {availableNumbers}
               </div>
               <div class="text-xs md:text-sm text-muted-foreground font-medium">
-                Días
+                Disponibles
               </div>
             </div>
-            <!-- Horas -->
+            <!-- Total -->
             <div class="text-center">
               <div
-                id="hours"
-                class="text-3xl md:text-4xl font-extrabold text-primary mb-1"
+                id="total-numbers"
+                class="text-3xl md:text-4xl font-extrabold text-foreground mb-1"
               >
-                {hours.toString().padStart(2, "0")}
+                {TOTAL_NUMBERS}
               </div>
               <div class="text-xs md:text-sm text-muted-foreground font-medium">
-                Horas
-              </div>
-            </div>
-            <!-- Minutos -->
-            <div class="text-center">
-              <div
-                id="minutes"
-                class="text-3xl md:text-4xl font-extrabold text-primary mb-1"
-              >
-                {minutes.toString().padStart(2, "0")}
-              </div>
-              <div class="text-xs md:text-sm text-muted-foreground font-medium">
-                Minutos
+                Total
               </div>
             </div>
           </div>
@@ -207,46 +176,42 @@ try {
   </div>
 </section>
 
-<script>
-  // Countdown script
-  const targetDate = parseInt(
-    document.getElementById("hero-section")?.dataset.targetDate || "0"
-  );
+<script define:vars={{ API_BASE_URL, RAFFLE_ID, TOTAL_NUMBERS }}>
+  // Numbers update script
+  async function updateNumbers() {
+    try {
+      const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`);
+      const data = await resp.json();
 
-  function updateCountdown() {
-    const now = new Date().getTime();
-    const distance = targetDate - now;
+      if (resp.ok && data.ok && Array.isArray(data.data?.numbers)) {
+        const soldNumbers = data.data.numbers.filter(
+          (n) => typeof n === "number" && !Number.isNaN(n)
+        ).length;
+        const availableNumbers = TOTAL_NUMBERS - soldNumbers;
 
-    if (distance < 0) {
-      const daysEl = document.getElementById("days");
-      const hoursEl = document.getElementById("hours");
-      const minutesEl = document.getElementById("minutes");
-      if (daysEl) daysEl.textContent = "0";
-      if (hoursEl) hoursEl.textContent = "0";
-      if (minutesEl) minutesEl.textContent = "0";
-      return;
+        const soldEl = document.getElementById("sold-numbers");
+        const availableEl = document.getElementById("available-numbers");
+        const dateTextEl = document.getElementById("raffle-date-text");
+
+        if (soldEl) soldEl.textContent = soldNumbers.toString();
+        if (availableEl) availableEl.textContent = availableNumbers.toString();
+
+        if (dateTextEl) {
+          if (availableNumbers > 0) {
+            dateTextEl.textContent = `Faltan ${availableNumbers} números por venderse para revelar al ganador`;
+          } else {
+            dateTextEl.textContent =
+              "¡Todos los números han sido vendidos! Pronto revelaremos al ganador";
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error updating numbers:", error);
     }
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor(
-      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    );
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-
-    const daysEl = document.getElementById("days");
-    const hoursEl = document.getElementById("hours");
-    const minutesEl = document.getElementById("minutes");
-
-    if (daysEl) daysEl.textContent = days.toString();
-    if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, "0");
-    if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, "0");
   }
 
-  // Actualizar inmediatamente
-  updateCountdown();
-
-  // Actualizar cada minuto
-  setInterval(updateCountdown, 60000);
+  // Actualizar cada 30 segundos
+  setInterval(updateNumbers, 30000);
 
   // Scroll buttons script
   document.addEventListener("DOMContentLoaded", () => {
@@ -255,7 +220,7 @@ try {
       button.addEventListener("click", () => {
         const targetId = button.getAttribute("data-scroll");
         if (targetId) {
-          const element = document.getElementById(targetId as string);
+          const element = document.getElementById(targetId);
           if (element) {
             element.scrollIntoView({ behavior: "smooth" });
           }

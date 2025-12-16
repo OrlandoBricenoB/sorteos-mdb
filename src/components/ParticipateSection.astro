@@ -8,7 +8,7 @@ import Sparkles from "./icons/Sparkles.astro";
 
 // ---- Datos Server-side (solo para el primer render y SEO, la UI será client-side) ----
 const TOTAL_NUMBERS = 200;
-const RAFFLE_ID = "1";
+const RAFFLE_ID = "2";
 const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
 
 // Obtener unavailableNumbers desde el endpoint del backend (SSR)
@@ -495,7 +495,7 @@ const unavailableDataset = unavailableNumbers.join(",");
   document.addEventListener("DOMContentLoaded", () => {
     const grid = document.getElementById("astro-number-grid");
     const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
-    const RAFFLE_ID = "1";
+    const RAFFLE_ID = "2";
     const numberButtons = new Map();
     let unavailableNumbers = [];
     if (grid) {

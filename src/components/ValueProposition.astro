@@ -9,8 +9,7 @@ const benefits = [
   {
     icon: Gift,
     title: "Premios originales",
-    description:
-      "Pack completo de productos L'Oreal Paris ELVIVE Glycolic Gloss valorado en más de $60",
+    description: `🏆 Combo completo de productos L'Oreal Paris ELVIVE Hidra Hialurónico<br />🥈 Gorro de baño + Toalla de microfibra + Cepillo masajeador<br />🥉Gorro de Satín + Scrunchies de Satín`,
   },
   {
     icon: DollarSign,
@@ -45,7 +44,7 @@ const benefits = [
       </p>
     </div>
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-center">
       {
         benefits.map((benefit) => {
           const IconComponent = benefit.icon;
@@ -57,7 +56,7 @@ const benefits = [
               <h3 class="text-xl font-semibold mb-2 text-card-foreground">
                 {benefit.title}
               </h3>
-              <p class="text-muted-foreground">{benefit.description}</p>
+              <p class="text-muted-foreground" set:html={benefit.description} />
             </Card>
           );
         })
