@@ -4,6 +4,7 @@ export interface Props {
   description: string;
   keywords?: string[];
   image?: string;
+  imagePng?: string;
   url?: string;
   type?: string;
   siteName?: string;
@@ -23,6 +24,7 @@ const {
   description,
   keywords = [],
   image,
+  imagePng,
   url,
   type = "website",
   siteName,
@@ -47,11 +49,17 @@ const fullUrl = url
     : new URL(url, baseUrl).href
   : Astro.url?.href || "";
 const canonicalUrl = canonical || fullUrl;
-const ogImageUrl = ogImage
-  ? ogImage.startsWith("http")
-    ? ogImage
-    : new URL(ogImage, baseUrl || fullUrl).href
-  : undefined;
+
+const resolveImageUrl = (img?: string) => {
+  return img
+    ? img.startsWith("http")
+      ? img
+      : new URL(img, baseUrl || fullUrl).href
+    : undefined;
+};
+
+const ogImageUrl = resolveImageUrl(ogImage);
+const ogPngUrl = resolveImageUrl(imagePng);
 ---
 
 <!-- Primary Meta Tags -->
@@ -72,15 +80,26 @@ const ogImageUrl = ogImage
 <meta property="og:url" content={fullUrl} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
+<meta property="og:locale" content={lang === "es" ? "es_ES" : lang} />
 {siteName && <meta property="og:site_name" content={siteName} />}
+
+{/* Primary Image (WebP) */}
 {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+{ogImageUrl && <meta property="og:image:type" content="image/webp" />}
 {ogImageUrl && <meta property="og:image:width" content="1200" />}
 {ogImageUrl && <meta property="og:image:height" content="630" />}
+
+{/* Fallback Image (PNG) */}
+{ogPngUrl && <meta property="og:image" content={ogPngUrl} />}
+{ogPngUrl && <meta property="og:image:type" content="image/png" />}
+{ogPngUrl && <meta property="og:image:width" content="1200" />}
+{ogPngUrl && <meta property="og:image:height" content="630" />}
 
 <!-- Twitter -->
 <meta name="twitter:card" content={twitterCard} />
 {twitterSite && <meta name="twitter:site" content={twitterSite} />}
 {twitterCreator && <meta name="twitter:creator" content={twitterCreator} />}
+<meta name="twitter:domain" content={new URL(fullUrl).hostname} />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
