@@ -1,0 +1,491 @@
+---
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
+const shorts = [
+  /*{
+    id: "short1",
+    title: "¡Mira lo que puedes ganar!",
+    thumbnail: "/shorts/thumb1.webp",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder: Rickroll for testing or just a sample
+  },*/
+  {
+    id: "short2",
+    title: "Testimonio de nuestra ganadora",
+    thumbnail: "/shorts/winner-video.webp",
+    videoUrl: "/shorts/winner-video.mp4",
+  },
+  {
+    id: "short3",
+    title: "¿Cómo participar? Paso a paso",
+    thumbnail: "/shorts/how-to-participate.webp",
+    videoUrl: "/shorts/how-to-participate.mp4",
+  },
+  /*{
+    id: "short4",
+    title: "Unboxing del Pack L'Oreal",
+    thumbnail: "/shorts/thumb4.webp",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+  },*/
+];
+---
+
+<section class="py-20 bg-gradient-to-b from-white to-secondary/30 overflow-hidden">
+  <div class="container mx-auto px-4">
+    <div class="mb-12 text-center animate-fade-in">
+      <h2 class="font-playfair text-4xl md:text-5xl font-bold text-foreground mb-4">
+        ¡Esto ha <span class="text-primary">pasado</span> y te puede pasar a ti!
+      </h2>
+      <!-- <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+        Y seguro que te puede pasar a ti también.
+      </p> -->
+    </div>
+
+    <div class="relative px-4 md:px-12">
+      <div class="swiper shortsSwiper !pb-14">
+        <div class="swiper-wrapper">
+          {shorts.map((short) => (
+            <div class="swiper-slide !h-auto">
+              <div 
+                class="short-card relative aspect-[9/16] rounded-[2rem] overflow-hidden bg-muted shadow-card group cursor-pointer border-4 border-white transition-all duration-300 hover:shadow-glow"
+                data-video-url={short.videoUrl}
+              >
+                <!-- Thumbnail -->
+                <img 
+                  src={short.thumbnail} 
+                  alt={short.title}
+                  class="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                />
+                
+                <!-- Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-6">
+                  <div class="transform transition-all duration-300 group-hover:translate-y-[-10px]">
+                    <h3 class="text-white font-playfair font-bold text-xl leading-tight mb-3">
+                      {short.title}
+                    </h3>
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center shadow-lg group-hover:bg-primary transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white fill-current translate-x-0.5" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </div>
+                      <span class="text-white/90 text-sm font-medium tracking-wide uppercase">Reproducir</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Play Button Center (Always visible) -->
+                <div class="absolute inset-0 flex items-center justify-center transition-opacity duration-300 pointer-events-none">
+                   <div class="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/30 transition-all duration-300 group-hover:bg-white/20 group-hover:scale-105">
+                      <div class="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-2xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-primary fill-current translate-x-0.5" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </div>
+                   </div>
+                </div>
+
+                <!-- Video Container (Hidden initially) -->
+                <div class="video-container absolute inset-0 bg-black hidden z-20">
+                  <!-- Iframe will be injected here -->
+                </div>
+
+                <!-- Transparent Overlay for swiping and click-to-pause -->
+                <div class="video-overlay absolute inset-0 z-25 hidden"></div>
+                
+                <!-- Play/Pause Indicator (Center) -->
+                <div class="play-pause-indicator absolute inset-0 flex items-center justify-center z-40 pointer-events-none opacity-0 transition-opacity duration-300">
+                   <div class="w-20 h-20 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white fill-current translate-x-1" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                   </div>
+                </div>
+
+                <!-- Mute button (Hidden initially) -->
+                <button class="mute-video absolute top-4 left-4 z-30 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md text-white hidden items-center justify-center hover:bg-black/70 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 unmute-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mute-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                  </svg>
+                </button>
+
+                <!-- Close button (Hidden initially) -->
+                <button class="close-video absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md text-white hidden items-center justify-center hover:bg-black/70 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <!-- Navigation Buttons -->
+      <div class="swiper-button-next !text-primary !w-8 !h-8 after:!text-lg hover:scale-110 transition-all duration-300 !-right-2 md:!-right-4"></div>
+      <div class="swiper-button-prev !text-primary !w-8 !h-8 after:!text-lg hover:scale-110 transition-all duration-300 !-left-2 md:!-left-4"></div>
+      <div class="swiper-pagination !bottom-0"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .short-card {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  
+  .swiper-button-disabled {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+
+  :global(.swiper-pagination-bullet-active) {
+    background: hsl(var(--primary)) !important;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.8s ease-out forwards;
+  }
+
+  .video-overlay {
+    background: transparent;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  import Swiper from "swiper";
+  import { Navigation, Pagination } from "swiper/modules";
+
+  function initShorts() {
+    const shortCards = document.querySelectorAll(".short-card");
+    let players: { [key: string]: any } = {};
+    let autoplayTimeout: any = null;
+
+    // Load YouTube IFrame API if not already loaded
+    if (!window.YT) {
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName("script")[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    }
+
+    const stopAllVideos = () => {
+      if (autoplayTimeout) {
+        clearTimeout(autoplayTimeout);
+        autoplayTimeout = null;
+      }
+      
+      shortCards.forEach((card) => {
+        const container = card.querySelector(".video-container") as HTMLElement;
+        const closeBtn = card.querySelector(".close-video");
+        const muteBtn = card.querySelector(".mute-video");
+        const overlay = card.querySelector(".video-overlay");
+        const cardId = card.getAttribute("data-card-id");
+
+        if (container && !container.classList.contains("hidden")) {
+          container.classList.add("hidden");
+          container.style.opacity = "0";
+          container.innerHTML = "";
+        }
+        if (closeBtn && !closeBtn.classList.contains("hidden")) {
+          closeBtn.classList.add("hidden");
+          closeBtn.classList.remove("flex");
+        }
+        if (muteBtn && !muteBtn.classList.contains("hidden")) {
+          muteBtn.classList.add("hidden");
+          muteBtn.classList.remove("flex");
+        }
+        if (overlay && !overlay.classList.contains("hidden")) {
+          overlay.classList.add("hidden");
+        }
+        if (cardId && players[cardId]) {
+          const indicator = card.querySelector(".play-pause-indicator") as HTMLElement;
+          if (indicator) indicator.style.opacity = "0";
+          
+          if (players[cardId] instanceof HTMLVideoElement) {
+            players[cardId].pause();
+            players[cardId].src = "";
+            players[cardId].load();
+          }
+          delete players[cardId];
+        }
+      });
+    };
+
+    const updateMuteUI = (card: Element, isMuted: boolean) => {
+      const muteIcon = card.querySelector(".mute-icon");
+      const unmuteIcon = card.querySelector(".unmute-icon");
+      if (isMuted) {
+        muteIcon?.classList.remove("hidden");
+        unmuteIcon?.classList.add("hidden");
+      } else {
+        muteIcon?.classList.add("hidden");
+        unmuteIcon?.classList.remove("hidden");
+      }
+    };
+
+    const toggleMute = (card: Element) => {
+      const cardId = card.getAttribute("data-card-id");
+      if (!cardId) return;
+      const player = players[cardId];
+      if (!player) return;
+
+      let isMuted = false;
+      if (player instanceof HTMLVideoElement) {
+        player.muted = !player.muted;
+        isMuted = player.muted;
+      } else if (player.getPlayerState) {
+        if (player.isMuted()) {
+          player.unMute();
+          isMuted = false;
+        } else {
+          player.mute();
+          isMuted = true;
+        }
+      }
+      updateMuteUI(card, isMuted);
+    };
+
+    const updatePlayPauseUI = (card: Element, isPaused: boolean) => {
+      const indicator = card.querySelector(".play-pause-indicator") as HTMLElement;
+      if (indicator) {
+        indicator.style.opacity = isPaused ? "1" : "0";
+      }
+    };
+
+    const togglePlayPause = (card: Element) => {
+      const cardId = card.getAttribute("data-card-id");
+      if (!cardId) return;
+      const player = players[cardId];
+      if (!player) return;
+
+      let isPaused = false;
+      if (player instanceof HTMLVideoElement) {
+        if (player.paused) {
+          player.play();
+          isPaused = false;
+        } else {
+          player.pause();
+          isPaused = true;
+        }
+      } else if (player.getPlayerState) {
+        const state = player.getPlayerState();
+        if (state === 1) {
+          player.pauseVideo();
+          isPaused = true;
+        } else {
+          player.playVideo();
+          isPaused = false;
+        }
+      }
+      updatePlayPauseUI(card, isPaused);
+    };
+
+    const playVideo = (card: Element, isAutoplay = false, isPreload = false) => {
+      const container = card.querySelector(".video-container") as HTMLElement;
+      const closeBtn = card.querySelector(".close-video");
+      const muteBtn = card.querySelector(".mute-video");
+      const overlay = card.querySelector(".video-overlay");
+      const videoUrl = card.getAttribute("data-video-url");
+      const cardId = card.getAttribute("data-card-id") || Math.random().toString(36).substr(2, 9);
+      card.setAttribute("data-card-id", cardId);
+
+      if (container && videoUrl && container.classList.contains("hidden")) {
+        if (!isPreload) stopAllVideos();
+
+        container.classList.remove("hidden");
+        container.style.opacity = isPreload ? "0" : "1";
+        container.style.transition = "opacity 0.5s ease-in-out";
+        
+        closeBtn?.classList.remove("hidden");
+        closeBtn?.classList.add("flex");
+        muteBtn?.classList.remove("hidden");
+        muteBtn?.classList.add("flex");
+        overlay?.classList.remove("hidden");
+
+        if (videoUrl.endsWith(".mp4")) {
+          container.innerHTML = `
+            <video 
+              class="w-full h-full object-cover" 
+              playsinline 
+              ${isAutoplay ? "muted" : ""} 
+              loop
+              src="${videoUrl}"
+            ></video>
+          `;
+          const video = container.querySelector("video");
+          if (video) {
+            players[cardId] = video;
+            updateMuteUI(card, isAutoplay);
+            updatePlayPauseUI(card, false);
+            video.play().catch((err) => console.log("Autoplay blocked or failed:", err));
+          }
+        } else {
+          const videoId = videoUrl.split("/").pop()?.split("?")[0];
+          const iframeId = `player-${cardId}`;
+          
+          container.innerHTML = `<div id="${iframeId}" class="w-full h-full"></div>`;
+
+          const createPlayer = () => {
+            if (!window.YT || !window.YT.Player) return;
+            players[cardId] = new window.YT.Player(iframeId, {
+              height: "100%",
+              width: "100%",
+              videoId: videoId,
+              playerVars: {
+                autoplay: 1,
+                mute: isAutoplay ? 1 : 0,
+                controls: 0,
+                modestbranding: 1,
+                rel: 0,
+                showinfo: 0,
+                iv_load_policy: 3,
+                playsinline: 1,
+                disablekb: 1,
+                fs: 0,
+              },
+              events: {
+                onReady: (event: any) => {
+                  if (!isAutoplay) event.target.unMute();
+                  updateMuteUI(card, isAutoplay);
+                  updatePlayPauseUI(card, false);
+                  event.target.playVideo();
+                },
+                onStateChange: (event: any) => {
+                  // If video ends or is paused by other means
+                  if (event.data === window.YT.PlayerState.PAUSED) {
+                    updatePlayPauseUI(card, true);
+                  } else if (event.data === window.YT.PlayerState.PLAYING) {
+                    updatePlayPauseUI(card, false);
+                  }
+                }
+              },
+            });
+          };
+
+          if (window.YT && window.YT.Player) {
+            createPlayer();
+          } else {
+            const checkAPI = setInterval(() => {
+              if (window.YT && window.YT.Player) {
+                createPlayer();
+                clearInterval(checkAPI);
+              }
+            }, 100);
+            window.onYouTubeIframeAPIReady = () => {
+              createPlayer();
+              clearInterval(checkAPI);
+            };
+          }
+        }
+      }
+    };
+
+    const swiper = new Swiper(".shortsSwiper", {
+      modules: [Navigation, Pagination],
+      slidesPerView: 1.2,
+      spaceBetween: 16,
+      centeredSlides: true,
+      centerInsufficientSlides: true,
+      loop: false,
+      touchStartPreventDefault: false,
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+      },
+      breakpoints: {
+        480: { slidesPerView: 1.8, spaceBetween: 20 },
+        768: { slidesPerView: 2.5, spaceBetween: 24, centeredSlides: false },
+        1024: { slidesPerView: 3.5, spaceBetween: 30, centeredSlides: false },
+        1280: { slidesPerView: 4, spaceBetween: 30, centeredSlides: false },
+      },
+      on: {
+        slideChange: function (s) {
+          stopAllVideos();
+          const isMobile = window.innerWidth < 768;
+          if (isMobile) {
+            const activeSlide = s.slides[s.activeIndex];
+            const card = activeSlide.querySelector(".short-card");
+            if (card) {
+              // Preload immediately but hidden
+              playVideo(card, true, true);
+              
+              // Show after 2 seconds
+              autoplayTimeout = setTimeout(() => {
+                const container = card.querySelector(".video-container") as HTMLElement;
+                if (container) container.style.opacity = "1";
+              }, 1000);
+            }
+          }
+        },
+      },
+    });
+
+    shortCards.forEach((card) => {
+      const closeBtn = card.querySelector(".close-video");
+      const muteBtn = card.querySelector(".mute-video");
+
+      card.addEventListener("click", (e) => {
+        if ((e.target as HTMLElement).closest(".close-video")) return;
+        if ((e.target as HTMLElement).closest(".mute-video")) return;
+        
+        const container = card.querySelector(".video-container");
+        if (container && !container.classList.contains("hidden")) {
+          togglePlayPause(card);
+        } else {
+          playVideo(card);
+        }
+      });
+
+      closeBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        stopAllVideos();
+      });
+
+      muteBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleMute(card);
+      });
+    });
+
+    const isMobile = window.innerWidth < 768;
+    if (isMobile && swiper.slides.length > 0) {
+      const firstCard = swiper.slides[0].querySelector(".short-card");
+      if (firstCard) {
+        playVideo(firstCard, true, true);
+        autoplayTimeout = setTimeout(() => {
+          const container = firstCard.querySelector(".video-container") as HTMLElement;
+          if (container) container.style.opacity = "1";
+        }, 1000);
+      }
+    }
+  }
+
+  // Declare global YT for TypeScript
+  declare global {
+    interface Window {
+      YT: any;
+      onYouTubeIframeAPIReady: () => void;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", initShorts);
+  document.addEventListener("astro:after-swap", initShorts);
+</script>
