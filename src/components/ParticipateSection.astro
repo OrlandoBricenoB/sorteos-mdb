@@ -6,34 +6,8 @@ import Label from "./ui/Label.astro";
 import FileInput from "./ui/FileInput.astro";
 import Sparkles from "./icons/Sparkles.astro";
 
-// ---- Datos Server-side (solo para el primer render y SEO, la UI será client-side) ----
-const TOTAL_NUMBERS = 200;
-const RAFFLE_ID = "2";
+// ---- Datos Server-side ----
 const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
-
-// Obtener unavailableNumbers desde el endpoint del backend (SSR)
-let unavailableNumbers = [];
-try {
-  const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`);
-  const data = await resp.json();
-  if (resp.ok && data.ok) {
-    unavailableNumbers = Array.isArray(data.data?.numbers)
-      ? data.data.numbers.filter(
-          (n: number) => typeof n === "number" && !Number.isNaN(n),
-        )
-      : [];
-  }
-} catch (err) {
-  unavailableNumbers = [];
-}
-
-const numbersList = Array.from({ length: TOTAL_NUMBERS }, (_, i) => ({
-  number: i + 1,
-  available: !unavailableNumbers.includes(i + 1),
-}));
-
-// Dataset string for passing unavailable numbers to client
-const unavailableDataset = unavailableNumbers.join(",");
 ---
 
 <section id="participate-section" class="py-20 bg-gradient-card">
@@ -488,33 +462,7 @@ const unavailableDataset = unavailableNumbers.join(",");
 <script type="module">
   // CLIENT SIDE SELECTION ONLY
   document.addEventListener("DOMContentLoaded", () => {
-    const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
-    const RAFFLE_ID = "2";
-
-    let unavailableNumbers = [];
-    const unavailableSet = new Set();
     const PARTICIPATION_COST = 2;
-
-    // Obtener los números no disponibles al cargar para evitar darlos en el aleatorio
-    async function fetchUnavailableNumbersFromAPI() {
-      try {
-        const resp = await fetch(
-          `${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`,
-        );
-        const data = await resp.json();
-        if (resp.ok && data.ok) {
-          unavailableSet.clear();
-          (data.data?.numbers ?? []).forEach((n) => {
-            if (typeof n === "number" && !isNaN(n)) {
-              unavailableSet.add(n);
-            }
-          });
-        }
-      } catch (error) {
-        console.warn("No se pudieron actualizar los números", error);
-      }
-    }
-    fetchUnavailableNumbersFromAPI();
 
     let selectedQuantity = 1;
     const qtyDisplay = document.getElementById("qty-display");
@@ -628,7 +576,7 @@ const unavailableDataset = unavailableNumbers.join(",");
         return;
       }
       // Validaciones básicas
-      if (!name || !email || numbers.length === 0) {
+      if (!name || !email || selectedQuantity.length === 0) {
         paymentMsg.textContent = "Por favor llena todos los campos requeridos.";
         return;
       }
@@ -699,7 +647,6 @@ const unavailableDataset = unavailableNumbers.join(",");
           }
         } else {
           // Manejar errores de la API
-          await fetchUnavailableNumbersFromAPI(); // Refresh to catch which are taken
           const errorMessage =
             data.message ||
             data.details ||
