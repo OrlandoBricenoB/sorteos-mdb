@@ -7,32 +7,6 @@ import "swiper/css/navigation";
 
 const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
 const RAFFLE_ID = "2";
-const TOTAL_NUMBERS = 200;
-
-let availableNumbers = 0;
-let soldNumbers = 0;
-let dateText = "El ganador será revelado una vez se vendan los 200 números";
-
-try {
-  const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`);
-  const data = await resp.json();
-
-  if (resp.ok && data.ok && Array.isArray(data.data?.numbers)) {
-    soldNumbers = data.data.numbers.filter(
-      (n: any) => typeof n === "number" && !Number.isNaN(n)
-    ).length;
-    availableNumbers = TOTAL_NUMBERS - soldNumbers;
-
-    if (availableNumbers > 0) {
-      dateText = `Faltan ${availableNumbers} números por venderse para revelar al ganador`;
-    } else {
-      dateText =
-        "¡Todos los números han sido vendidos! Pronto revelaremos al ganador";
-    }
-  }
-} catch (error) {
-  console.error("Error fetching raffle numbers:", error);
-}
 ---
 
 <section
@@ -40,7 +14,6 @@ try {
   class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero"
   data-api-url={API_BASE_URL}
   data-raffle-id={RAFFLE_ID}
-  data-total-numbers={TOTAL_NUMBERS}
 >
   <div
     class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmJiZDMiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxIDEuNzktNCA0LTRzNCAxLjc5IDQgNC0xLjc5IDQtNCA0LTQtMS43OS00LTR6bTAgMTBjMC0yLjIxIDEuNzktNCA0LTRzNCAxLjc5IDQgNC0xLjc5IDQtNCA0LTQtMS43OS00LTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-40"
@@ -70,8 +43,7 @@ try {
 
         <p class="text-xl md:text-2xl text-muted-foreground font-light">
           ¡Invierte solo <span class="font-semibold text-primary">$2</span> y participa
-          para ganar alguno de los 3 premios que se entregarán al alcanzar a los 200
-          participantes!
+          para ganar alguno de los 3 premios que se sortearán el 10 de Mayo!
         </p>
 
         <div
@@ -102,8 +74,10 @@ try {
             <div class="text-sm text-muted-foreground">Inversión</div>
           </div>
           <div class="text-center min-w-[90px]">
-            <div class="text-2xl sm:text-3xl font-bold text-primary">200</div>
-            <div class="text-sm text-muted-foreground">Participaciones</div>
+            <div class="text-2xl sm:text-3xl font-bold text-primary">
+              10 de Mayo
+            </div>
+            <div class="text-sm text-muted-foreground">Fecha del sorteo</div>
           </div>
           <div class="text-center min-w-[90px]">
             <div class="text-2xl sm:text-3xl font-bold text-primary">+$100</div>
@@ -119,37 +93,55 @@ try {
             <h3
               class="font-playfair text-xl md:text-2xl font-bold text-foreground mb-1"
             >
-              📊 Estado del Sorteo
+              ⏳ Tiempo Restante
             </h3>
             <p id="raffle-date-text" class="text-sm text-muted-foreground">
-              {dateText}
+              El sorteo finaliza el 10 de Mayo
             </p>
           </div>
-          <div
-            class="flex flex-row items-center justify-center gap-6 md:gap-10"
-          >
-            <!-- Números Disponibles -->
+          <div class="flex flex-row items-center justify-center gap-4 md:gap-6">
             <div class="text-center">
               <div
-                id="available-numbers"
+                id="countdown-days"
                 class="text-3xl md:text-4xl font-extrabold text-accent mb-1"
               >
-                {availableNumbers}
+                --
               </div>
               <div class="text-xs md:text-sm text-muted-foreground font-medium">
-                Disponibles
+                Días
               </div>
             </div>
-            <!-- Total -->
             <div class="text-center">
               <div
-                id="total-numbers"
-                class="text-3xl md:text-4xl font-extrabold text-foreground mb-1"
+                id="countdown-hours"
+                class="text-3xl md:text-4xl font-extrabold text-accent mb-1"
               >
-                {TOTAL_NUMBERS}
+                --
               </div>
               <div class="text-xs md:text-sm text-muted-foreground font-medium">
-                Total
+                Hrs
+              </div>
+            </div>
+            <div class="text-center">
+              <div
+                id="countdown-minutes"
+                class="text-3xl md:text-4xl font-extrabold text-accent mb-1"
+              >
+                --
+              </div>
+              <div class="text-xs md:text-sm text-muted-foreground font-medium">
+                Min
+              </div>
+            </div>
+            <div class="text-center">
+              <div
+                id="countdown-seconds"
+                class="text-3xl md:text-4xl font-extrabold text-accent mb-1"
+              >
+                --
+              </div>
+              <div class="text-xs md:text-sm text-muted-foreground font-medium">
+                Seg
               </div>
             </div>
           </div>
@@ -238,43 +230,35 @@ try {
   const RAFFLE_ID = heroSection?.dataset.raffleId;
   const TOTAL_NUMBERS = parseInt(heroSection?.dataset.totalNumbers || "0");
 
-  // Numbers update script
-  async function updateNumbers() {
-    if (!API_BASE_URL || !RAFFLE_ID) return;
+  // Countdown update script
+  function updateCountdown() {
+    const now = new Date().getTime();
+    let endDate = new Date("2026-05-10T23:59:59").getTime();
 
-    try {
-      const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`);
-      const data = await resp.json();
+    let distance = endDate - now;
+    if (distance < 0) distance = 0;
 
-      if (resp.ok && data.ok && Array.isArray(data.data?.numbers)) {
-        const soldNumbers = data.data.numbers.filter(
-          (n: any) => typeof n === "number" && !Number.isNaN(n)
-        ).length;
-        const availableNumbers = TOTAL_NUMBERS - soldNumbers;
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        const soldEl = document.getElementById("sold-numbers");
-        const availableEl = document.getElementById("available-numbers");
-        const dateTextEl = document.getElementById("raffle-date-text");
+    const dEl = document.getElementById("countdown-days");
+    const hEl = document.getElementById("countdown-hours");
+    const mEl = document.getElementById("countdown-minutes");
+    const sEl = document.getElementById("countdown-seconds");
 
-        if (soldEl) soldEl.textContent = soldNumbers.toString();
-        if (availableEl) availableEl.textContent = availableNumbers.toString();
-
-        if (dateTextEl) {
-          if (availableNumbers > 0) {
-            dateTextEl.textContent = `Faltan ${availableNumbers} números por venderse para revelar al ganador`;
-          } else {
-            dateTextEl.textContent =
-              "¡Todos los números han sido vendidos! Pronto revelaremos al ganador";
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error updating numbers:", error);
-    }
+    if (dEl) dEl.textContent = days.toString().padStart(2, "0");
+    if (hEl) hEl.textContent = hours.toString().padStart(2, "0");
+    if (mEl) mEl.textContent = minutes.toString().padStart(2, "0");
+    if (sEl) sEl.textContent = seconds.toString().padStart(2, "0");
   }
 
-  // Actualizar cada 30 segundos
-  setInterval(updateNumbers, 30000);
+  // Actualizar cada segundo
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
 
   // Scroll buttons script
   document.addEventListener("DOMContentLoaded", () => {

@@ -4,31 +4,7 @@ import Button from "./ui/Button.astro";
 const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
 const RAFFLE_ID = "2";
 const RAFFLE_SLUG = "l-oreal-hidra-hialuronico";
-const TOTAL_NUMBERS = 200;
 
-// Fetch initial participants (taken numbers) server-side for initial render
-let participants = [];
-let soldNumbers = 0;
-try {
-  const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`);
-  const data = await resp.json();
-  if (resp.ok && data.ok) {
-    participants = Array.isArray(data.data?.numbers)
-      ? data.data.numbers.filter(
-          (n: any) => typeof n === "number" && !Number.isNaN(n)
-        )
-      : [];
-    soldNumbers = participants.length;
-  }
-} catch (err) {
-  console.error("Error fetching participants for roulette:", err);
-  participants = [];
-}
-
-const participantsJson = JSON.stringify(participants);
-
-// Check if all numbers are sold (200 numbers)
-const canSpin = soldNumbers >= TOTAL_NUMBERS;
 ---
 
 <section
@@ -38,66 +14,67 @@ const canSpin = soldNumbers >= TOTAL_NUMBERS;
   <div class="absolute inset-0 opacity-5 pointer-events-none"></div>
 
   <div class="container mx-auto px-4 relative z-10">
-    <div class="text-center mb-12 space-y-4">
+    <div class="text-center mb-4 md:mb-6 space-y-2">
       <h2 class="font-playfair text-4xl md:text-5xl font-bold text-foreground">
-        La Ruleta Ganadora
+        El Gran Sorteo
       </h2>
-      <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
-        El ganador será revelado una vez se vendan los 200 números. ¡Gira la
-        ruleta para descubrir si eres el afortunado!
+      <p class="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+        El ganador será revelado el 10 de Mayo.
+        <br />
+        ¡Jala la palanca para descubrir si eres el afortunado!
       </p>
     </div>
 
-    <div class="flex flex-col items-center justify-center gap-8">
-      <div
-        class="relative w-[300px] h-[300px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px]"
-      >
-        <!-- Pointer -->
-        <div
-          id="roulette-pointer"
-          class={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 z-20 w-8 h-12 md:w-10 md:h-16 filter drop-shadow-lg ${!canSpin ? "animate-bounce" : ""}`}
-        >
-          <svg
-            viewBox="0 0 40 60"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            class="w-full h-full text-primary"
-          >
-            <path d="M20 60L0 0H40L20 60Z" fill="currentColor"></path>
-          </svg>
+    <div class="flex flex-col items-center justify-center gap-6">
+      
+      <!-- Slot Machine -->
+      <div class="flex items-end justify-center select-none pt-2 md:pt-4">
+        
+        <!-- Slot Body -->
+        <div class="flex gap-2 md:gap-4 items-center justify-center bg-card p-6 md:p-10 rounded-3xl shadow-[0_15px_40px_-5px_rgba(255,107,157,0.3)] border-[6px] border-primary relative overflow-hidden z-20 bg-gradient-to-b from-white to-pink-50">
+          
+          <div class="absolute inset-0 bg-gradient-to-b from-white/60 to-transparent pointer-events-none z-20"></div>
+
+          <!-- Digits -->
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div class="slot-digit relative w-16 h-24 md:w-24 md:h-32 bg-white rounded-xl shadow-[inset_0_4px_10px_rgba(0,0,0,0.1),_0_2px_4px_rgba(0,0,0,0.05)] border border-gray-200 overflow-hidden transform perspective-1000">
+              <div
+                class="slot-strip absolute top-0 left-0 w-full flex flex-col items-center justify-start text-5xl md:text-7xl font-bold font-mono text-primary drop-shadow-sm"
+                id={`slot-${i}`}
+              >
+                <!-- Populated by JS -->
+              </div>
+              <!-- Inner darkening overlay for depth -->
+              <div class="absolute inset-0 pointer-events-none shadow-[inset_0_12px_12px_-10px_rgba(0,0,0,0.4),_inset_0_-12px_12px_-10px_rgba(0,0,0,0.4)] z-10"></div>
+            </div>
+          ))}
+          
+        </div>
+        
+        <!-- Lever attached lower and diagonal like a classic machine -->
+        <div class="relative flex items-end cursor-pointer group z-10 -ml-2 mb-8 md:mb-12" id="lever-container">
+          <!-- Lever Base / Hinge -->
+          <div class="w-8 h-16 md:w-10 md:h-20 bg-primary rounded-r-xl relative z-20 flex flex-col items-center justify-center">
+          </div>
+          
+          <!-- Lever Stick -->
+          <div class="absolute left-2 bottom-8 w-4 md:w-5 h-40 md:h-48 origin-bottom transition-transform duration-500 ease-out z-10" id="lever-stick" style="transform: rotate(25deg);">
+            <div class="w-full h-full bg-primary rounded-full relative">
+              <!-- Knob -->
+              <div class="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-pink-200 via-pink-300 to-pink-400 rounded-full absolute -top-8 -left-5 md:-top-10 md:-left-[22px] border flex items-center justify-center border-pink-200/50 group-hover:brightness-110 pointer-events-none transition-all duration-300 transform group-active:scale-95" />
+            </div>
+          </div>
         </div>
 
-        <!-- Wheel Container -->
-        <div
-          class="w-full h-full rounded-full shadow-2xl border-8 border-white bg-white relative overflow-hidden transition-transform duration-[5000ms] cubic-bezier(0.25, 0.1, 0.25, 1)"
-          id="roulette-wheel-container"
-        >
-          <canvas id="roulette-canvas" class="w-full h-full"></canvas>
-        </div>
-
-        <!-- Center Cap -->
-        <div
-          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 md:w-16 md:h-16 bg-white rounded-full shadow-lg z-10 flex items-center justify-center border-4 border-primary"
-        >
-          <span
-            class="hidden md:block text-primary font-bold text-lg md:text-xl"
-            >Md'B</span
-          >
-          <span
-            class="block md:hidden text-primary font-bold text-lg md:text-xl"
-            >M</span
-          >
-        </div>
       </div>
 
-      <div class="flex flex-col items-center gap-4 mt-8">
+      <div class="flex flex-col items-center gap-4 mt-4 md:mt-6">
         <Button
           id="spin-btn"
           size="lg"
-          disabled={!canSpin}
           class="bg-gradient-cta text-white font-bold text-xl px-12 py-6 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {canSpin ? "GIRAR RULETA" : `PRONTO`}
+          JALAR PALANCA
         </Button>
         <p
           id="roulette-message"
@@ -109,188 +86,180 @@ const canSpin = soldNumbers >= TOTAL_NUMBERS;
   </div>
 </section>
 
-<script define:vars={{ participantsJson, API_BASE_URL, RAFFLE_ID, RAFFLE_SLUG }}
->
-  const canvas = document.getElementById("roulette-canvas");
-  const container = document.getElementById("roulette-wheel-container");
+<style>
+  /* Optional inner shadow for the digits to look sunken */
+  .slot-digit {
+    box-shadow: inset 0 4px 6px rgba(0,0,0,0.1), inset 0 -4px 6px rgba(0,0,0,0.05);
+  }
+</style>
+
+<script define:vars={{ API_BASE_URL, RAFFLE_SLUG }}>
   const spinBtn = document.getElementById("spin-btn");
   const messageEl = document.getElementById("roulette-message");
+  const leverContainer = document.getElementById("lever-container");
+  const leverStick = document.getElementById("lever-stick");
 
-  let participants = JSON.parse(participantsJson);
-  // If no participants, add some placeholders for visual if needed, or handle empty state
-  if (participants.length === 0) {
-    participants = []; // Fallback for empty state visualization
-  }
+  const slotStrips = [
+    document.getElementById("slot-0"),
+    document.getElementById("slot-1"),
+    document.getElementById("slot-2"),
+    document.getElementById("slot-3"),
+  ];
 
-  const ctx = canvas.getContext("2d");
+  // Initialize strips
+  function initStrips() {
+    const isMd = window.innerWidth >= 768;
+    const itemHeight = isMd ? 128 : 96; // 32rem -> 128px, 24rem -> 96px
 
-  // High DPI scaling
-  const dpr = window.devicePixelRatio || 1;
-  const rect = container.getBoundingClientRect();
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  ctx.scale(dpr, dpr);
-
-  let centerX = rect.width / 2;
-  let centerY = rect.height / 2;
-  let radius = rect.width / 2;
-
-  const colors = ["#FF6B9D", "#FF8E8E", "#FFB5B5", "#FFD1D1", "#FFF0F0"];
-  const textColors = ["#ffffff", "#ffffff", "#4a041d", "#4a041d", "#4a041d"];
-
-  function drawWheel() {
-    const numSegments = participants.length;
-    const arcSize = (2 * Math.PI) / numSegments;
-
-    participants.forEach((number, i) => {
-      const angle = i * arcSize;
-
-      ctx.beginPath();
-      ctx.fillStyle = colors[i % colors.length];
-      ctx.moveTo(centerX, centerY);
-      ctx.arc(centerX, centerY, radius, angle, angle + arcSize);
-      ctx.lineTo(centerX, centerY);
-      ctx.fill();
-      ctx.stroke();
-
-      // Text
-      ctx.save();
-      ctx.translate(centerX, centerY);
-      ctx.rotate(angle + arcSize / 2);
-      ctx.textAlign = "right";
-      ctx.fillStyle = textColors[i % textColors.length];
-      ctx.font = "bold 14px Inter, sans-serif";
-      ctx.fillText(number.toString(), radius - 20, 5);
-      ctx.restore();
+    slotStrips.forEach((strip) => {
+      let stripHTML = `<div class="w-full flex items-center justify-center text-gray-300" style="height: ${itemHeight}px">-</div>`;
+      strip.innerHTML = stripHTML;
+      strip.style.transform = `translateY(0px)`;
+      strip.style.transition = 'none';
+      strip.dataset.initial = "true";
     });
   }
 
-  drawWheel();
+  function generateStripContent(targetChar) {
+    const isMd = window.innerWidth >= 768;
+    const itemHeight = isMd ? 128 : 96;
+    
+    // We want lots of numbers to spin through
+    const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    let html = `<div class="w-full flex items-center justify-center text-gray-300" style="height: ${itemHeight}px">-</div>`;
+    
+    // Repeat the base numbers randomly to simulate spinning
+    for (let i = 0; i < 4; i++) {
+        const shuffled = [...numbers].sort(() => Math.random() - 0.5);
+        shuffled.forEach((n) => {
+            html += `<div class="w-full flex items-center justify-center" style="height: ${itemHeight}px">${n}</div>`;
+        });
+    }
 
-  let currentRotation = 0;
+    // Append the target character at the very end
+    html += `<div class="w-full flex items-center justify-center text-accent" style="height: ${itemHeight}px">${targetChar}</div>`;
+    
+    return html;
+  }
 
-  spinBtn.addEventListener("click", async () => {
-    spinBtn.disabled = true;
-    messageEl.textContent = "Consultando ganador...";
-    messageEl.className = "text-lg font-medium text-muted-foreground";
-
-    try {
-      // Fetch winner from backend
-      const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_SLUG}/winner`);
-      const data = await resp.json();
-
-      // Check for NOT_AVAILABLE message in various likely places
-      if (
-        data.message === "NOT_AVAILABLE" ||
-        data.data?.message === "NOT_AVAILABLE" ||
-        data.code === "NOT_AVAILABLE"
-      ) {
-        messageEl.textContent =
-          "Aún no se han vendido los 200 números. El ganador será revelado cuando se completen todas las ventas.";
-        messageEl.className = "text-lg font-bold text-orange-500";
-        spinBtn.disabled = false;
-        return;
-      }
-
-      // Try to find the winner in likely places
-      let winningNumber = data.data?.number;
-
-      if (winningNumber === undefined || winningNumber === null) {
-        console.error("Respuesta inesperada:", data);
-        throw new Error("No winner data received");
-      }
-
-      // Ensure it's a number
-      winningNumber = Number(winningNumber);
-
-      const winningIndex = participants.indexOf(winningNumber);
-
-      if (winningIndex === -1) {
-        messageEl.textContent = `El número ganador es ${winningNumber}, pero no está en la lista visible.`;
-        spinBtn.disabled = false;
-        return;
-      }
-
-      // Calculate rotation to land on the winner
-      // The pointer is at the top (270 degrees or -90 degrees in canvas logic, but 0 in CSS rotate is usually top if we align it right)
-      // Actually, let's keep it simple. 0 degrees is usually 3 o'clock in canvas.
-      // Pointer is at Top (12 o'clock).
-      // We need to rotate the wheel so the winning segment aligns with the top.
-
-      const numSegments = participants.length;
-      const segmentAngle = 360 / numSegments;
-
-      // Random extra spins (at least 5)
-      const extraSpins = 5 * 360;
-
-      // Calculate where the winning segment is currently
-      // Segment i starts at i * segmentAngle
-      // Center of segment i is at i * segmentAngle + segmentAngle/2
-      // We want this center to be at -90 degrees (Top)
-
-      // Target rotation:
-      // currentRotation + extraSpins + (offset to align winner)
-
-      // Let's say we want the final rotation to be R.
-      // The position of segment i at rotation R is: (i * segmentAngle + R) % 360
-      // We want this to be 270 (Top).
-      // i * segmentAngle + R = 270
-      // R = 270 - i * segmentAngle
-
-      // To ensure we always spin forward:
-      const targetAngleBase =
-        270 - winningIndex * segmentAngle - segmentAngle / 2;
-
-      // Adjust targetAngleBase to be > currentRotation
-      let targetRotation =
-        currentRotation +
-        extraSpins +
-        (targetAngleBase - (currentRotation % 360));
-
-      // Ensure it's always adding positive rotation
-      if (targetRotation <= currentRotation) {
-        targetRotation += 360;
-      }
-
-      // Apply rotation via CSS
-      container.style.transform = `rotate(${targetRotation}deg)`;
-      currentRotation = targetRotation;
-
-      // Stop pointer animation
-      const pointer = document.getElementById("roulette-pointer");
-      if (pointer) {
-        pointer.classList.remove("animate-bounce");
-      }
-
-      messageEl.textContent = "¡Girando!...";
-
-      // Wait for animation to finish (5s)
-      setTimeout(() => {
-        messageEl.textContent = `¡El número ganador es el ${winningNumber}! 🎉`;
-        messageEl.className = "text-2xl font-bold text-primary animate-bounce";
-        // Launch confetti or something here if desired
-        spinBtn.disabled = false;
-      }, 5000);
-    } catch (err) {
-      console.error(err);
-      messageEl.textContent = "Hubo un error al consultar el ganador.";
-      messageEl.className = "text-lg font-bold text-red-500";
-      spinBtn.disabled = false;
+  // Handle Resize to keep height correct
+  window.addEventListener("resize", () => {
+    // If not spinning, re-init. If spinning, might look slightly off during resize but ok
+    let isSpinning = spinBtn.disabled;
+    if (!isSpinning) {
+       initStrips();
     }
   });
 
-  // Handle resize
-  window.addEventListener("resize", () => {
-    const rect = container.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+  initStrips();
 
-    // Update center and radius based on new dimensions
-    centerX = rect.width / 2;
-    centerY = rect.height / 2;
-    radius = rect.width / 2;
+  // Function to pull lever and spin
+  async function spinSlotMachine() {
+    if (spinBtn.disabled) return;
+    spinBtn.disabled = true;
 
-    drawWheel();
-  });
+    // Animate lever
+    if (leverStick) {
+      leverStick.style.transform = "rotateX(-60deg) rotateZ(25deg) scaleY(0.8)";
+      setTimeout(() => {
+        leverStick.style.transform = "rotateX(0deg) rotateZ(25deg) scaleY(1)";
+      }, 400);
+    }
+
+    messageEl.textContent = "Girando...";
+    messageEl.className = "text-lg font-medium text-muted-foreground";
+
+    let targetDigits = ["?", "?", "?", "?"];
+
+    const now = new Date();
+    // 0-indexed month. May is 4. Day is 10 or greater.
+    // If we want exact validation, check year too:
+    const isMay10 = now.getMonth() >= 4 && now.getDate() >= 10 && now.getFullYear() >= 2024;
+
+    if (!isMay10) {
+      targetDigits = ["?", "?", "?", "?"];
+    } else {
+      messageEl.textContent = "Consultando ganador...";
+      try {
+        const resp = await fetch(`${API_BASE_URL}/raffles/${RAFFLE_SLUG}/winner`);
+        const data = await resp.json();
+
+        if (
+          data.message === "NOT_AVAILABLE" ||
+          data.data?.message === "NOT_AVAILABLE" ||
+          data.code === "NOT_AVAILABLE"
+        ) {
+          messageEl.textContent =
+            "Aún no se ha definido el ganador.";
+          messageEl.className = "text-lg font-bold text-orange-500";
+          spinBtn.disabled = false;
+          return;
+        }
+
+        let winningNumber = data.data?.number;
+
+        if (winningNumber === undefined || winningNumber === null) {
+          throw new Error("No winner data received");
+        }
+
+        winningNumber = Number(winningNumber);
+        
+        // Padr 4 characters: 0010, 0100, etc.
+        const paddedString = winningNumber.toString().padStart(4, "0");
+        targetDigits = paddedString.split("");
+      } catch (err) {
+        console.error(err);
+        messageEl.textContent = "Hubo un error al consultar el ganador.";
+        messageEl.className = "text-lg font-bold text-red-500";
+        spinBtn.disabled = false;
+        return;
+      }
+    }
+
+    messageEl.textContent = "Girando...";
+    
+    const isMd = window.innerWidth >= 768;
+    const itemHeight = isMd ? 128 : 96;
+
+    // Set content and animate
+    slotStrips.forEach((strip, i) => {
+      strip.style.transition = 'none';
+      strip.innerHTML = generateStripContent(targetDigits[i]);
+      strip.style.transform = `translateY(0px)`;
+
+      // Force reflow
+      void strip.offsetWidth;
+
+      // The target is at the end. Total children = 1 (dash) + 40 (random numbers) + 1 (target) = 42
+      const targetIndex = strip.children.length - 1;
+      const targetOffset = targetIndex * itemHeight;
+
+      // Ensure each reel spins a bit longer than the previous one
+      const spinDuration = 3000 + i * 500;
+      
+      strip.style.transition = `transform ${spinDuration}ms cubic-bezier(0.15, 0.85, 0.15, 1)`;
+      
+      setTimeout(() => {
+        strip.style.transform = `translateY(-${targetOffset}px)`;
+      }, 50);
+    });
+
+    // Determine max duration to re-enable button
+    const maxSpinDuration = 3000 + 3 * 500 + 100; // 4600ms
+    setTimeout(() => {
+      if (!isMay10) {
+        messageEl.textContent = "Pronto se revelará al ganador";
+        messageEl.className = "text-lg font-bold text-primary animate-bounce";
+      } else {
+        messageEl.textContent = `¡El número ganador es el ${targetDigits.join("")}! 🎉`;
+        messageEl.className = "text-2xl font-bold text-primary animate-bounce";
+      }
+      spinBtn.disabled = false;
+    }, maxSpinDuration);
+  }
+
+  spinBtn.addEventListener("click", spinSlotMachine);
+  if (leverContainer) {
+    leverContainer.addEventListener("click", spinSlotMachine);
+  }
 </script>
