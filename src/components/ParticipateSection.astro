@@ -19,7 +19,7 @@ try {
   if (resp.ok && data.ok) {
     unavailableNumbers = Array.isArray(data.data?.numbers)
       ? data.data.numbers.filter(
-          (n: number) => typeof n === "number" && !Number.isNaN(n)
+          (n: number) => typeof n === "number" && !Number.isNaN(n),
         )
       : [];
   }
@@ -84,38 +84,34 @@ const unavailableDataset = unavailableNumbers.join(",");
           </div>
           <div class="bg-secondary rounded-xl p-6 space-y-3">
             <h3 class="font-semibold text-lg flex items-center gap-2 mb-2">
-              Selecciona tus números para participar:
+              ¿Cuántas participaciones deseas?
             </h3>
-            <div id="number-picker-server">
-              <div
-                class="number-grid"
-                id="astro-number-grid"
-                data-unavailable-numbers={unavailableDataset}
+            <div class="flex items-center justify-center gap-6 py-4">
+              <button
+                type="button"
+                id="qty-minus"
+                class="w-14 h-14 rounded-full border-[3px] border-primary/20 text-primary flex items-center justify-center font-bold text-3xl hover:bg-primary/10 transition-colors focus:ring-4 focus:ring-primary/20 active:scale-95"
+                >−</button
               >
-                {
-                  numbersList.map(({ number, available }) => (
-                    <button
-                      type="button"
-                      class="number-btn"
-                      disabled={!available}
-                      data-number={number}
-                      data-unavailable={!available ? "true" : undefined}
-                      aria-pressed="false"
-                    >
-                      {number}
-                    </button>
-                  ))
-                }
-              </div>
               <div
-                class="text-center text-xs mt-2 font-medium"
-                id="astro-numbers-picked-msg"
+                class="text-4xl font-black text-foreground w-16 text-center select-none"
+                id="qty-display"
               >
-                No has elegido ningún número aún.
+                1
               </div>
+              <button
+                type="button"
+                id="qty-plus"
+                class="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-3xl hover:bg-primary/90 shadow-lg shadow-primary/30 transition-all focus:ring-4 focus:ring-primary/30 active:scale-95"
+                >+</button
+              >
             </div>
-            <div class="text-xs text-muted-foreground mt-2 text-center">
-              Algunos números ya pueden estar tomados. Puedes elegir más de uno.
+            <div
+              class="text-sm text-center text-muted-foreground px-4"
+              id="qty-desc"
+            >
+              Tu <span class="font-bold text-primary">1 número</span> será asignado
+              aleatoriamente de los disponibles al confirmar.
             </div>
           </div>
           <Button
@@ -123,9 +119,8 @@ const unavailableDataset = unavailableNumbers.join(",");
             type="button"
             size="lg"
             class="w-full bg-gradient-cta transition-all duration-300 text-lg py-6 rounded-full font-semibold"
-            disabled
           >
-            Selecciona al menos un número
+            Participar por $2
           </Button>
           <p class="text-center text-sm text-muted-foreground">
             Al participar aceptas nuestros términos y condiciones del sorteo
@@ -493,125 +488,78 @@ const unavailableDataset = unavailableNumbers.join(",");
 <script type="module">
   // CLIENT SIDE SELECTION ONLY
   document.addEventListener("DOMContentLoaded", () => {
-    const grid = document.getElementById("astro-number-grid");
     const API_BASE_URL = "https://api.sorteosmdb.com/api/v1";
     const RAFFLE_ID = "2";
-    const numberButtons = new Map();
-    let unavailableNumbers = [];
-    if (grid) {
-      const datasetVal = grid.dataset.unavailableNumbers;
-      if (datasetVal) {
-        unavailableNumbers = datasetVal
-          .split(",")
-          .map((n) => parseInt(n, 10))
-          .filter((n) => !isNaN(n));
-      }
-    }
 
-    const selectedNumbers = new Set();
-    const unavailableSet = new Set(unavailableNumbers);
+    let unavailableNumbers = [];
+    const unavailableSet = new Set();
     const PARTICIPATION_COST = 2;
 
-    const btn = document.getElementById("participate-btn");
-
-    function renderPicked() {
-      const msg = document.getElementById("astro-numbers-picked-msg");
-      if (!msg) return;
-      if (selectedNumbers.size > 0) {
-        msg.innerHTML = `Números elegidos: <span style="color: hsl(340 82% 67%)">${Array.from(
-          selectedNumbers
-        )
-          .sort((a, b) => a - b)
-          .join(", ")}</span>`;
-      } else {
-        msg.textContent = "No has elegido ningún número aún.";
-      }
-      renderButtonAndCost();
-    }
-
-    function renderButtonAndCost() {
-      if (!btn) return;
-      const count = selectedNumbers.size;
-      if (count > 0) {
-        btn.disabled = false;
-        btn.textContent = `Participar por $${count * PARTICIPATION_COST}`;
-        btn.classList.remove("button-disabled");
-      } else {
-        btn.disabled = true;
-        btn.textContent = `Selecciona al menos un número`;
-        btn.classList.add("button-disabled");
-      }
-    }
-
-    function markButtonAsUnavailable(btnNum) {
-      if (!btnNum) return;
-      btnNum.classList.remove("selected");
-      btnNum.setAttribute("aria-pressed", "false");
-      btnNum.classList.add("unavailable");
-      btnNum.disabled = true;
-      btnNum.dataset.unavailable = "true";
-    }
-
-    function applyUnavailableState(numbers = []) {
-      numbers
-        .filter((n) => typeof n === "number" && !Number.isNaN(n))
-        .forEach((number) => {
-          unavailableSet.add(number);
-          const btnNum = numberButtons.get(number);
-          markButtonAsUnavailable(btnNum);
-          if (selectedNumbers.has(number)) {
-            selectedNumbers.delete(number);
-          }
-        });
-      renderPicked();
-    }
-
+    // Obtener los números no disponibles al cargar para evitar darlos en el aleatorio
     async function fetchUnavailableNumbersFromAPI() {
       try {
         const resp = await fetch(
-          `${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`
+          `${API_BASE_URL}/raffles/${RAFFLE_ID}/numbers`,
         );
         const data = await resp.json();
         if (resp.ok && data.ok) {
-          applyUnavailableState(data.data?.numbers ?? []);
+          unavailableSet.clear();
+          (data.data?.numbers ?? []).forEach((n) => {
+            if (typeof n === "number" && !isNaN(n)) {
+              unavailableSet.add(n);
+            }
+          });
         }
       } catch (error) {
         console.warn("No se pudieron actualizar los números", error);
       }
     }
+    fetchUnavailableNumbersFromAPI();
 
-    // Solo cambia las clases para selección (no re-render ni eliminación de nodos)
-    if (grid) {
-      Array.from(grid.querySelectorAll(".number-btn")).forEach((btnNum) => {
-        const number = parseInt(btnNum.dataset.number, 10);
-        numberButtons.set(number, btnNum);
-        const isUnavailable =
-          btnNum.dataset.unavailable === "true" || btnNum.disabled;
+    let selectedQuantity = 1;
+    const qtyDisplay = document.getElementById("qty-display");
+    const qtyDesc = document.getElementById("qty-desc");
+    const btnMinus = document.getElementById("qty-minus");
+    const btnPlus = document.getElementById("qty-plus");
+    const btn = document.getElementById("participate-btn");
 
-        if (!isUnavailable) {
-          btnNum.addEventListener("click", () => {
-            if (selectedNumbers.has(number)) {
-              selectedNumbers.delete(number);
-              btnNum.classList.remove("selected");
-              btnNum.setAttribute("aria-pressed", "false");
-            } else {
-              if (unavailableSet.has(number)) {
-                markButtonAsUnavailable(btnNum);
-                return;
-              }
-              selectedNumbers.add(number);
-              btnNum.classList.add("selected");
-              btnNum.setAttribute("aria-pressed", "true");
-            }
-            renderPicked();
-          });
+    function renderButtonAndCost() {
+      if (!btn) return;
+      if (selectedQuantity > 0) {
+        btn.disabled = false;
+        btn.textContent = `Participar por $${Math.max(1, selectedQuantity) * PARTICIPATION_COST}`;
+        btn.classList.remove("button-disabled");
+      } else {
+        btn.disabled = true;
+      }
+      if (qtyDisplay) qtyDisplay.textContent = selectedQuantity;
+      if (qtyDesc) {
+        if (selectedQuantity === 1) {
+          qtyDesc.innerHTML = `Tu <span class="font-bold text-primary">1 número</span> será asignado aleatoriamente de los disponibles al confirmar.`;
+        } else {
+          qtyDesc.innerHTML = `Tus <span class="font-bold text-primary">${selectedQuantity} números</span> serán asignados aleatoriamente de los disponibles al confirmar.`;
+        }
+      }
+    }
+
+    if (btnMinus) {
+      btnMinus.addEventListener("click", () => {
+        if (selectedQuantity > 1) {
+          selectedQuantity--;
+          renderButtonAndCost();
+        }
+      });
+    }
+    if (btnPlus) {
+      btnPlus.addEventListener("click", () => {
+        if (selectedQuantity < 100) {
+          selectedQuantity++;
+          renderButtonAndCost();
         }
       });
     }
 
-    renderPicked();
-    applyUnavailableState(unavailableNumbers);
-    fetchUnavailableNumbersFromAPI();
+    renderButtonAndCost();
 
     // Modal
     const modal = document.getElementById("payment-modal");
@@ -648,8 +596,8 @@ const unavailableDataset = unavailableNumbers.join(",");
         alert("Por favor completa todos los campos para participar.");
         return;
       }
-      if (selectedNumbers.size === 0) {
-        alert("Por favor selecciona al menos un número para participar.");
+      if (selectedQuantity < 1) {
+        alert("Por favor selecciona al menos una participación.");
         return;
       }
       openModal();
@@ -660,7 +608,7 @@ const unavailableDataset = unavailableNumbers.join(",");
       e.preventDefault();
       const name = document.getElementById("name")?.value?.trim();
       const email = document.getElementById("email")?.value?.trim();
-      const numbers = Array.from(selectedNumbers).sort((a, b) => a - b);
+
       const paymentImageInput = document.getElementById("payment-image");
       const paymentImage = paymentImageInput?.files?.[0];
       const paymentRefInput = document.getElementById("payment-ref");
@@ -692,7 +640,7 @@ const unavailableDataset = unavailableNumbers.join(",");
       const formData = new FormData();
       formData.append("name", name);
       formData.append("email", email);
-      formData.append("numbers", JSON.stringify(numbers));
+      formData.append("quantity", selectedQuantity);
       formData.append("paymentRef", paymentRef);
       formData.append("paymentImage", paymentImage);
       const storedReferral = localStorage.getItem("referralCode");
@@ -713,7 +661,7 @@ const unavailableDataset = unavailableNumbers.join(",");
           {
             method: "POST",
             body: formData,
-          }
+          },
         );
 
         const data = await resp.json();
@@ -727,24 +675,8 @@ const unavailableDataset = unavailableNumbers.join(",");
           closeModal();
 
           // Limpia todo
-          selectedNumbers.clear();
-          if (grid) {
-            Array.from(grid.querySelectorAll(".number-btn.selected")).forEach(
-              (btnSel) => {
-                btnSel.classList.remove("selected");
-                btnSel.setAttribute("aria-pressed", "false");
-              }
-            );
-          }
-          const takenNumbersSuccess = data.data?.numbers_taken ?? [];
-          if (
-            Array.isArray(takenNumbersSuccess) &&
-            takenNumbersSuccess.length > 0
-          ) {
-            applyUnavailableState(takenNumbersSuccess);
-          }
-          await fetchUnavailableNumbersFromAPI();
-          renderPicked();
+          selectedQuantity = 1;
+          renderButtonAndCost();
           document.getElementById("participate-form").reset();
 
           // Limpiar el input de tipo 'file' específicamente
@@ -761,19 +693,13 @@ const unavailableDataset = unavailableNumbers.join(",");
             // Fallback si no hay código
             setTimeout(() => {
               alert(
-                `¡Participación confirmada! Te enviaremos el código de referido a tu correo electrónico próximamente. ¡Gracias por participar!`
+                `¡Participación confirmada! Te enviaremos el código de referido a tu correo electrónico próximamente. ¡Gracias por participar!`,
               );
             }, 100);
           }
         } else {
           // Manejar errores de la API
-          const numbersTakenError = data.data?.numbers_taken ?? [];
-          if (
-            Array.isArray(numbersTakenError) &&
-            numbersTakenError.length > 0
-          ) {
-            applyUnavailableState(numbersTakenError);
-          }
+          await fetchUnavailableNumbersFromAPI(); // Refresh to catch which are taken
           const errorMessage =
             data.message ||
             data.details ||
@@ -814,7 +740,7 @@ const unavailableDataset = unavailableNumbers.join(",");
     const successModal = document.getElementById("success-modal");
     const successModalClose = document.getElementById("success-modal-close");
     const referralCodeDisplay = document.getElementById(
-      "referral-code-display"
+      "referral-code-display",
     );
     const shareReferralBtn = document.getElementById("share-referral-btn");
     const shareBtnText = document.getElementById("share-btn-text");
@@ -948,7 +874,7 @@ const unavailableDataset = unavailableNumbers.join(",");
         console.error("Error al copiar:", err);
         alert(
           "No se pudo copiar el link. Por favor, cópialo manualmente: " +
-            currentReferralLink
+            currentReferralLink,
         );
       }
 
